@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[46,)"
+loaderVersion = "[4,)"
 license = "GPL3 / CC BY-NC-ND 4.0"
 
 [[mods]]
@@ -7,30 +7,36 @@ modId = "tacz"
 version = "${file.jarVersion}"
 displayName = "Timeless & Classics Guns: Zero"
 logoFile = "logo.png"
-updateJSONURL = ""
-displayURL = ""
 authors = "Serene Wave Studio | Timeless Squad"
 description = '''
 '''
 
+# ================= Mixin 配置 =================
+[[mixins]]
+config = "tacz.mixins.json"
+
+[[mixins]]
+config = "tacz.compat.acceleratedrendering.mixins.json"
+
+# ================= 依赖 =================
 [[dependencies.tacz]]
-modId = "forge"
-mandatory = true
-versionRange = "[46,)"
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.0,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.tacz]]
 modId = "minecraft"
-mandatory = true
-versionRange = "[1.20,1.20.2)"
+type = "required"
+versionRange = "[1.21.1,1.22)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.tacz]]
 modId = "shouldersurfing"
-mandatory = false
-versionRange = "[1.20.1-4.0.0,)"
+type = "optional"
+versionRange = "[1.21.1-5.0.0,)"
 ordering = "NONE"
 side = "CLIENT"
 

@@ -1,22 +1,19 @@
+// TACZ — NeoForge 1.21.1 移植分支
+// 注意：本机 gradlePluginPortal() 与 services.gradle.org 被代理阻断，
+// 插件源改用可达的国内镜像 + NeoForged 官方仓库（不要改回 gradlePluginPortal()）。
 pluginManagement {
     repositories {
-        maven { url = 'https://maven.parchmentmc.org' }
-        maven {
-            // 阿里云镜像，方便国内开发
-            url = uri("https://maven.aliyun.com/repository/public/")
-        }
+        mavenLocal()
+        maven { url = 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url = 'https://maven.neoforged.net/releases' }
         mavenCentral()
-        gradlePluginPortal()
-        maven { url = 'https://maven.minecraftforge.net/' }
     }
 }
 
+// LuaJ 以 git 源码依赖方式引入（GitHub 在本机可达，git 已配 http.proxy）
 sourceControl {
     gitRepository(URI.create("https://github.com/FiguraMC/luaj.git")) {
         producesModule("com.github.FiguraMC.luaj:luaj-jse-figura")
-    }
-
-    gitRepository(URI.create("https://github.com/FiguraMC/luaj.git")) {
         producesModule("com.github.FiguraMC.luaj:luaj-core-figura")
     }
 }
