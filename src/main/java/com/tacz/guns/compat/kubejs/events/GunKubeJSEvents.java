@@ -16,6 +16,7 @@ import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,8 +55,8 @@ public class GunKubeJSEvents {
 
         @Override
         public Object cancel() throws EventExit {
-            if (event.isCancelable()) {
-                event.setCanceled(true);
+            if (event instanceof ICancellableEvent cancellable) {
+                cancellable.setCanceled(true);
             }
             return super.cancel();
         }
