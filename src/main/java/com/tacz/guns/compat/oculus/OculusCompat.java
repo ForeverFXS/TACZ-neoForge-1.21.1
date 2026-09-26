@@ -5,7 +5,7 @@ import com.tacz.guns.compat.oculus.newly.OculusCompatNewly;
 import com.tacz.guns.init.CompatRegistry;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import java.util.function.Function;

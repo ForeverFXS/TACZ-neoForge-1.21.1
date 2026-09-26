@@ -2,8 +2,8 @@ package com.tacz.guns.api.event.common;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.fml.LogicalSide;
+import net.neoforged.bus.api.Event;
+import net.neoforged.fml.LogicalSide;
 
 /**
  * 生物射击时触发的事件。与 {@link GunFireEvent}不同的是，扣动一次扳机只会触发一次这个事件，但可能多次触发 {@link GunFireEvent}（如枪械处于 Burst 模式）

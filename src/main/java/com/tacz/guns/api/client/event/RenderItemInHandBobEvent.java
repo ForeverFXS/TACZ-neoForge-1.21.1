@@ -2,7 +2,7 @@ package com.tacz.guns.api.client.event;
 
 import com.tacz.guns.api.event.common.KubeJSGunEventPoster;
 import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
 
 /**
  * 当第一人称视角触发摇晃时，玩家手部的摇晃

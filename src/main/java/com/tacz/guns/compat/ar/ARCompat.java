@@ -2,7 +2,7 @@ package com.tacz.guns.compat.ar;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 
 public class ARCompat {
 
