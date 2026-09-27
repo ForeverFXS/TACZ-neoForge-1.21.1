@@ -20,18 +20,19 @@ import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.rhino.util.wrap.TypeWrappers;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegisterEvent;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.RegisterEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class TimelessKubeJSPlugin extends KubeJSPlugin {
     public static final String KUBEJS_MODID = "kubejs";
-    private static final Map<String, RegistryObject<? extends AbstractGunItem>> GUNTYPE_REGISTER_MAP = new HashMap<>();
+    private static final Map<String, DeferredHolder<Item, ? extends AbstractGunItem>> GUNTYPE_REGISTER_MAP = new HashMap<>();
 
     @Override
     public void init() {
@@ -69,14 +70,14 @@ public class TimelessKubeJSPlugin extends KubeJSPlugin {
         event.register("gunSmithTableResultInfo", GunSmithTableResultComponents.RESULT_INFO);
     }
 
-    public static void registerGunType(String typeName, RegistryObject<? extends AbstractGunItem> registryObject) {
-        GUNTYPE_REGISTER_MAP.put(typeName, registryObject);
+    public static void registerGunType(String typeName, DeferredHolder<Item, ? extends AbstractGunItem> itemHolder) {
+        GUNTYPE_REGISTER_MAP.put(typeName, itemHolder);
     }
 
     @SubscribeEvent
     public void onItemRegister(RegisterEvent event) {
-        if (ModList.get().isLoaded(KUBEJS_MODID) && event.getRegistryKey().equals(ForgeRegistries.ITEMS.getRegistryKey())) {
-            for (Map.Entry<String, RegistryObject<? extends AbstractGunItem>> entry : GUNTYPE_REGISTER_MAP.entrySet()) {
+        if (ModList.get().isLoaded(KUBEJS_MODID) && event.getRegistryKey().equals(Registries.ITEM)) {
+            for (Map.Entry<String, DeferredHolder<Item, ? extends AbstractGunItem>> entry : GUNTYPE_REGISTER_MAP.entrySet()) {
                 GunItemManager.registerGunItem(entry.getKey(), entry.getValue());
             }
         }

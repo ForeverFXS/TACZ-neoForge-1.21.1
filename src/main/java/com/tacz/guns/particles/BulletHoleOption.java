@@ -11,7 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class BulletHoleOption implements ParticleOptions {
     public static final Codec<BulletHoleOption> CODEC = RecordCodecBuilder.create(builder ->
@@ -103,6 +103,6 @@ public class BulletHoleOption implements ParticleOptions {
 
     @Override
     public String writeToString() {
-        return ForgeRegistries.PARTICLE_TYPES.getKey(this.getType()) + " " + this.direction.getName();
+        return BuiltInRegistries.PARTICLE_TYPE.getKey(this.getType()) + " " + this.direction.getName();
     }
 }

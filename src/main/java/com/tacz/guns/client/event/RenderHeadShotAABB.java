@@ -14,7 +14,7 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class RenderHeadShotAABB {
@@ -28,7 +28,7 @@ public class RenderHeadShotAABB {
             return;
         }
         LivingEntity entity = event.getEntity();
-        ResourceLocation entityId = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType());
+        ResourceLocation entityId = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
         if (entityId == null) {
             return;
         }

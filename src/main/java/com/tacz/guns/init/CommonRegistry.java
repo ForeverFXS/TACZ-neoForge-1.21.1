@@ -33,7 +33,7 @@ public final class CommonRegistry {
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeModificationEvent event) {
         event.getTypes().forEach(type -> {
-            event.add(type, ModAttributes.BULLET_RESISTANCE.get());
+            event.add(type, ModAttributes.BULLET_RESISTANCE);
         });
     }
 

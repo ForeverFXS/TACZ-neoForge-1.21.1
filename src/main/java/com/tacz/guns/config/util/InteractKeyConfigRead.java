@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.EnumMap;
@@ -35,7 +35,7 @@ public class InteractKeyConfigRead {
     }
 
     public static boolean canInteractBlock(BlockState block) {
-        ResourceLocation blockId = ForgeRegistries.BLOCKS.getKey(block.getBlock());
+        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block.getBlock());
         if (blockId == null) {
             return false;
         }
@@ -54,7 +54,7 @@ public class InteractKeyConfigRead {
     }
 
     public static boolean canInteractEntity(Entity entity) {
-        ResourceLocation entityId = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType());
+        ResourceLocation entityId = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
         if (entityId == null) {
             return false;
         }

@@ -18,7 +18,7 @@ public class EntityDamageEvent {
         if (event.getSource().is(ModDamageTypes.BULLETS_TAG)) {
             LivingEntity living = event.getEntity();
 
-            AttributeInstance resistance = living.getAttribute(ModAttributes.BULLET_RESISTANCE.get());
+            AttributeInstance resistance = living.getAttribute(ModAttributes.BULLET_RESISTANCE);
             if (resistance != null) {
                 float modifiedDamage = event.getAmount() * (float) (1 - resistance.getValue());
                 event.setAmount(modifiedDamage);

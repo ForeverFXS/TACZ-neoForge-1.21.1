@@ -4,8 +4,8 @@ import com.tacz.guns.compat.kubejs.TimelessKubeJSPlugin;
 import dev.latvian.mods.kubejs.item.ItemBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.core.registries.Registries;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class CustomGunItemBuilder extends ItemBuilder {
     public String typeName;
@@ -21,7 +21,7 @@ public class CustomGunItemBuilder extends ItemBuilder {
 
     @Override
     public Item createObject() {
-        TimelessKubeJSPlugin.registerGunType(typeName, RegistryObject.create(this.id, ForgeRegistries.ITEMS));
+        TimelessKubeJSPlugin.registerGunType(typeName, DeferredHolder.create(Registries.ITEM, this.id));
         return new KubeJSCustomGunItem();
     }
 }

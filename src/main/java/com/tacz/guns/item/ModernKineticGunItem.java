@@ -32,7 +32,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.apache.logging.log4j.MarkerManager;
 import org.joml.Vector2d;
 import org.luaj.vm2.*;
@@ -525,7 +525,7 @@ public class ModernKineticGunItem extends AbstractGunItem implements GunItemData
             return;
         }
         for (EffectData data : effects) {
-            MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(data.getEffectId());
+            MobEffect mobEffect = BuiltInRegistries.MOB_EFFECT.get(data.getEffectId());
             if (mobEffect == null) {
                 continue;
             }
