@@ -10,11 +10,24 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class ServerMessageGunFire {
+public class ServerMessageGunFire implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ServerMessageGunFire> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "server_message_gun_fire"));
+    public static final StreamCodec<FriendlyByteBuf, ServerMessageGunFire> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ServerMessageGunFire::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ServerMessageGunFire> type() {
+        return TYPE;
+    }
+
     private final int shooterId;
     private final ItemStack gunItemStack;
 
@@ -25,21 +38,19 @@ public class ServerMessageGunFire {
 
     public static void encode(ServerMessageGunFire message, FriendlyByteBuf buf) {
         buf.writeVarInt(message.shooterId);
-        buf.writeItem(message.gunItemStack);
+        ItemStack.OPTIONAL_STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, message.gunItemStack);
     }
 
     public static ServerMessageGunFire decode(FriendlyByteBuf buf) {
         int shooterId = buf.readVarInt();
-        ItemStack gunItemStack = buf.readItem();
+        ItemStack gunItemStack = ItemStack.OPTIONAL_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
         return new ServerMessageGunFire(shooterId, gunItemStack);
     }
 
-    public static void handle(ServerMessageGunFire message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isClient()) {
+    public static void handle(ServerMessageGunFire message, IPayloadContext context) {
+        if (context.flow().isClientbound()) {
             context.enqueueWork(() -> doClientEvent(message));
         }
-        context.setPacketHandled(true);
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -10,11 +10,24 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class ServerMessageGunDraw {
+public class ServerMessageGunDraw implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ServerMessageGunDraw> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "server_message_gun_draw"));
+    public static final StreamCodec<FriendlyByteBuf, ServerMessageGunDraw> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ServerMessageGunDraw::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ServerMessageGunDraw> type() {
+        return TYPE;
+    }
+
     private final int entityId;
     private final ItemStack previousGunItem;
     private final ItemStack currentGunItem;
@@ -27,23 +40,21 @@ public class ServerMessageGunDraw {
 
     public static void encode(ServerMessageGunDraw message, FriendlyByteBuf buf) {
         buf.writeVarInt(message.entityId);
-        buf.writeItem(message.previousGunItem);
-        buf.writeItem(message.currentGunItem);
+        ItemStack.OPTIONAL_STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, message.previousGunItem);
+        ItemStack.OPTIONAL_STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, message.currentGunItem);
     }
 
     public static ServerMessageGunDraw decode(FriendlyByteBuf buf) {
         int entityId = buf.readVarInt();
-        ItemStack previousGunItem = buf.readItem();
-        ItemStack currentGunItem = buf.readItem();
+        ItemStack previousGunItem = ItemStack.OPTIONAL_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
+        ItemStack currentGunItem = ItemStack.OPTIONAL_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
         return new ServerMessageGunDraw(entityId, previousGunItem, currentGunItem);
     }
 
-    public static void handle(ServerMessageGunDraw message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isClient()) {
+    public static void handle(ServerMessageGunDraw message, IPayloadContext context) {
+        if (context.flow().isClientbound()) {
             context.enqueueWork(() -> doClientEvent(message));
         }
-        context.setPacketHandled(true);
     }
 
     @OnlyIn(Dist.CLIENT)

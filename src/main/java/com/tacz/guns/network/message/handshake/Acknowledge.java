@@ -1,30 +1,36 @@
 package com.tacz.guns.network.message.handshake;
 
 import com.tacz.guns.GunMod;
-import com.tacz.guns.network.IMessage;
-import com.tacz.guns.network.LoginIndexHolder;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.util.function.Supplier;
-
-public class Acknowledge extends LoginIndexHolder implements IMessage<Acknowledge> {
+/**
+ * 客户端对实体数据映射的确认包。
+ * <p>
+ * 原实现依赖 Forge 登录阶段（loginIndex + markAsLoginPacket），1.21 已无自定义 login payload，
+ * 现作为 play 阶段 {@code playToServer} 包使用，内容为空。
+ */
+public class Acknowledge implements CustomPacketPayload {
     public static final Marker ACKNOWLEDGE = MarkerManager.getMarker("HANDSHAKE_ACKNOWLEDGE");
 
-    @Override
-    public void encode(Acknowledge message, FriendlyByteBuf buffer) {
-    }
+    public static final CustomPacketPayload.Type<Acknowledge> TYPE =
+            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "acknowledge"));
+
+    public static final StreamCodec<FriendlyByteBuf, Acknowledge> STREAM_CODEC =
+            StreamCodec.of((buf, msg) -> {
+            }, buf -> new Acknowledge());
 
     @Override
-    public Acknowledge decode(FriendlyByteBuf buf) {
-        return new Acknowledge();
+    public CustomPacketPayload.Type<Acknowledge> type() {
+        return TYPE;
     }
 
-    @Override
-    public void handle(Acknowledge message, Supplier<NetworkEvent.Context> c) {
+    public static void handle(Acknowledge message, IPayloadContext context) {
         GunMod.LOGGER.debug(ACKNOWLEDGE, "Received acknowledgement from client");
-        c.get().setPacketHandled(true);
     }
 }

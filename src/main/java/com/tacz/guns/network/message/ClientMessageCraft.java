@@ -4,11 +4,22 @@ import com.tacz.guns.inventory.GunSmithTableMenu;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ClientMessageCraft {
+public class ClientMessageCraft implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ClientMessageCraft> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "client_message_craft"));
+    public static final StreamCodec<FriendlyByteBuf, ClientMessageCraft> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ClientMessageCraft::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ClientMessageCraft> type() {
+        return TYPE;
+    }
+
     private final ResourceLocation recipeId;
     private final int menuId;
 
@@ -26,12 +37,10 @@ public class ClientMessageCraft {
         return new ClientMessageCraft(buf.readResourceLocation(), buf.readVarInt());
     }
 
-    public static void handle(ClientMessageCraft message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isServer()) {
+    public static void handle(ClientMessageCraft message, IPayloadContext context) {
+        if (context.flow().isServerbound()) {
             context.enqueueWork(() -> {
-                ServerPlayer entity = context.getSender();
-                if (entity == null) {
+                if (!(context.player() instanceof ServerPlayer entity)) {
                     return;
                 }
                 if (entity.containerMenu.containerId == message.menuId && entity.containerMenu instanceof GunSmithTableMenu menu) {
@@ -39,6 +48,5 @@ public class ClientMessageCraft {
                 }
             });
         }
-        context.setPacketHandled(true);
     }
 }

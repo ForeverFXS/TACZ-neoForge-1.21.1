@@ -43,7 +43,7 @@ public class LocalPlayerCrawl {
         TimelessAPI.getClientGunIndex(gunId).ifPresent(gunIndex -> {
             this.isCrawling = isCrawl;
             this.crawCooldownTicks = COOLDOWN_TICKS;
-            NetworkHandler.CHANNEL.sendToServer(new ClientMessagePlayerCrawl(isCrawl));
+            NetworkHandler.sendToServer(new ClientMessagePlayerCrawl(isCrawl));
         });
     }
 

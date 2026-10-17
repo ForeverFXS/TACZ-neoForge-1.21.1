@@ -8,13 +8,25 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ServerMessageUpdateEntityData {
+public class ServerMessageUpdateEntityData implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ServerMessageUpdateEntityData> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "server_message_update_entity_data"));
+    public static final StreamCodec<FriendlyByteBuf, ServerMessageUpdateEntityData> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ServerMessageUpdateEntityData::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ServerMessageUpdateEntityData> type() {
+        return TYPE;
+    }
+
     private final int entityId;
     private final List<DataEntry<?, ?>> entries;
 
@@ -39,12 +51,10 @@ public class ServerMessageUpdateEntityData {
         return new ServerMessageUpdateEntityData(entityId, entries);
     }
 
-    public static void handle(ServerMessageUpdateEntityData message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isClient()) {
+    public static void handle(ServerMessageUpdateEntityData message, IPayloadContext context) {
+        if (context.flow().isClientbound()) {
             context.enqueueWork(() -> onHandle(message));
         }
-        context.setPacketHandled(true);
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -51,7 +51,7 @@ public class ZoomKey {
             }
             IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
             if (operator.isAim()) {
-                NetworkHandler.CHANNEL.sendToServer(new ClientMessagePlayerZoom());
+                NetworkHandler.sendToServer(new ClientMessagePlayerZoom());
                 return true;
             }
         }
@@ -65,7 +65,7 @@ public class ZoomKey {
         }
         IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
         if (operator.isAim()) {
-            NetworkHandler.CHANNEL.sendToServer(new ClientMessagePlayerZoom());
+            NetworkHandler.sendToServer(new ClientMessagePlayerZoom());
         }
     }
 }

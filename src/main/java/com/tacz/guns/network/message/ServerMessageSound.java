@@ -4,11 +4,22 @@ import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.client.sound.SoundPlayManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ServerMessageSound {
+public class ServerMessageSound implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ServerMessageSound> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "server_message_sound"));
+    public static final StreamCodec<FriendlyByteBuf, ServerMessageSound> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ServerMessageSound::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ServerMessageSound> type() {
+        return TYPE;
+    }
+
     private final int entityId;
     private final ResourceLocation gunId;
     private final ResourceLocation gunDisplayId;
@@ -52,12 +63,10 @@ public class ServerMessageSound {
         return new ServerMessageSound(entityId, gunId, gunDisplayId, soundName, volume, pitch, distance);
     }
 
-    public static void handle(ServerMessageSound message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isClient()) {
+    public static void handle(ServerMessageSound message, IPayloadContext context) {
+        if (context.flow().isClientbound()) {
             context.enqueueWork(() -> SoundPlayManager.playMessageSound(message));
         }
-        context.setPacketHandled(true);
     }
 
     public int getEntityId() {

@@ -9,11 +9,23 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ClientMessageRefitGun {
+public class ClientMessageRefitGun implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ClientMessageRefitGun> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "client_message_refit_gun"));
+    public static final StreamCodec<FriendlyByteBuf, ClientMessageRefitGun> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ClientMessageRefitGun::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ClientMessageRefitGun> type() {
+        return TYPE;
+    }
+
     private final int attachmentSlotIndex;
     private final int gunSlotIndex;
     private final AttachmentType attachmentType;
@@ -34,12 +46,10 @@ public class ClientMessageRefitGun {
         return new ClientMessageRefitGun(buf.readInt(), buf.readInt(), buf.readEnum(AttachmentType.class));
     }
 
-    public static void handle(ClientMessageRefitGun message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isServer()) {
+    public static void handle(ClientMessageRefitGun message, IPayloadContext context) {
+        if (context.flow().isServerbound()) {
             context.enqueueWork(() -> {
-                ServerPlayer player = context.getSender();
-                if (player == null) {
+                if (!(context.player() instanceof ServerPlayer player)) {
                     return;
                 }
                 Inventory inventory = player.getInventory();
@@ -73,7 +83,6 @@ public class ClientMessageRefitGun {
                 }
             });
         }
-        context.setPacketHandled(true);
     }
 
 }

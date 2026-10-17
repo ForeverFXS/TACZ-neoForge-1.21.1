@@ -44,7 +44,7 @@ public class LocalPlayerReload {
                 return;
             }
             // 发包通知服务器
-            NetworkHandler.CHANNEL.sendToServer(new ClientMessagePlayerCancelReload());
+            NetworkHandler.sendToServer(new ClientMessagePlayerCancelReload());
             // 执行本地取消换弹逻辑
             this.cancelReload(display);
         });
@@ -86,7 +86,7 @@ public class LocalPlayerReload {
                 return;
             }
             // 发包通知服务器
-            NetworkHandler.CHANNEL.sendToServer(new ClientMessagePlayerReloadGun());
+            NetworkHandler.sendToServer(new ClientMessagePlayerReloadGun());
             // 执行客户端 reload 相关内容
             this.doReload(gunItem, display, gunData, mainHandItem);
         });

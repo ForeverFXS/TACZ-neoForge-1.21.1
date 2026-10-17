@@ -6,11 +6,24 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
-public class ServerMessageLevelUp {
+public class ServerMessageLevelUp implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ServerMessageLevelUp> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "server_message_level_up"));
+    public static final StreamCodec<FriendlyByteBuf, ServerMessageLevelUp> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ServerMessageLevelUp::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ServerMessageLevelUp> type() {
+        return TYPE;
+    }
+
     private final ItemStack gun;
     private final int level;
 
@@ -20,22 +33,20 @@ public class ServerMessageLevelUp {
     }
 
     public static void encode(ServerMessageLevelUp message, FriendlyByteBuf buf) {
-        buf.writeItemStack(message.gun, true);
+        ItemStack.OPTIONAL_STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, message.gun);
         buf.writeInt(message.level);
     }
 
     public static ServerMessageLevelUp decode(FriendlyByteBuf buf) {
-        ItemStack gun = buf.readItem();
+        ItemStack gun = ItemStack.OPTIONAL_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
         int level = buf.readInt();
         return new ServerMessageLevelUp(gun, level);
     }
 
-    public static void handle(ServerMessageLevelUp message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isClient()) {
+    public static void handle(ServerMessageLevelUp message, IPayloadContext context) {
+        if (context.flow().isClientbound()) {
             context.enqueueWork(() -> onLevelUp(message));
         }
-        context.setPacketHandled(true);
     }
 
     @OnlyIn(Dist.CLIENT)

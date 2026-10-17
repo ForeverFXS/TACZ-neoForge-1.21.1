@@ -31,7 +31,7 @@ public class LocalPlayerAim {
         TimelessAPI.getClientGunIndex(gunId).ifPresent(gunIndex -> {
             data.clientIsAiming = isAim;
             // 发送切换开火模式的数据包，通知服务器
-            NetworkHandler.CHANNEL.sendToServer(new ClientMessagePlayerAim(isAim));
+            NetworkHandler.sendToServer(new ClientMessagePlayerAim(isAim));
         });
     }
 

@@ -5,9 +5,9 @@ import com.tacz.guns.network.NetworkHandler;
 import com.tacz.guns.resource.GunPackLoader;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 
@@ -17,8 +17,15 @@ public final class CommonRegistry {
 
     @SubscribeEvent
     public static void onSetupEvent(FMLCommonSetupEvent event) {
-        event.enqueueWork(NetworkHandler::init);
         event.enqueueWork(ModSyncedEntityData::init);
+    }
+
+    /**
+     * 1.21 网络包注册入口：{@link RegisterPayloadHandlersEvent} 属于 mod 总线事件。
+     */
+    @SubscribeEvent
+    public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
+        NetworkHandler.register(event);
     }
 
     @SubscribeEvent

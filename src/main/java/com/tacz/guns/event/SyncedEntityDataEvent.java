@@ -49,7 +49,7 @@ public final class SyncedEntityDataEvent {
                 List<DataEntry<?, ?>> entries = holder.gatherAll();
                 entries.removeIf(entry -> !entry.getKey().syncMode().isTracking());
                 if (!entries.isEmpty()) {
-                    NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) event.getEntity()), new ServerMessageUpdateEntityData(entity.getId(), entries));
+                    NetworkHandler.sendToClientPlayer(new ServerMessageUpdateEntityData(entity.getId(), entries), event.getEntity());
                 }
             }
         }
@@ -63,7 +63,7 @@ public final class SyncedEntityDataEvent {
             if (holder != null) {
                 List<DataEntry<?, ?>> entries = holder.gatherAll();
                 if (!entries.isEmpty()) {
-                    NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new ServerMessageUpdateEntityData(player.getId(), entries));
+                    NetworkHandler.sendToClientPlayer(new ServerMessageUpdateEntityData(player.getId(), entries), player);
                 }
             }
         }
@@ -113,11 +113,11 @@ public final class SyncedEntityDataEvent {
             }
             List<DataEntry<?, ?>> selfEntries = entries.stream().filter(entry -> entry.getKey().syncMode().isSelf()).collect(Collectors.toList());
             if (!selfEntries.isEmpty() && entity instanceof ServerPlayer) {
-                NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) entity), new ServerMessageUpdateEntityData(entity.getId(), selfEntries));
+                NetworkHandler.sendToClientPlayer(new ServerMessageUpdateEntityData(entity.getId(), selfEntries), entity);
             }
             List<DataEntry<?, ?>> trackingEntries = entries.stream().filter(entry -> entry.getKey().syncMode().isTracking()).collect(Collectors.toList());
             if (!trackingEntries.isEmpty()) {
-                NetworkHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), new ServerMessageUpdateEntityData(entity.getId(), trackingEntries));
+                NetworkHandler.sendToTrackingEntity(new ServerMessageUpdateEntityData(entity.getId(), trackingEntries), entity);
             }
             holder.clean();
         }

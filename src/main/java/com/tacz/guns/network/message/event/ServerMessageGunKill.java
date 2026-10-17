@@ -11,12 +11,23 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ServerMessageGunKill {
+public class ServerMessageGunKill implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ServerMessageGunKill> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "server_message_gun_kill"));
+    public static final StreamCodec<FriendlyByteBuf, ServerMessageGunKill> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ServerMessageGunKill::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ServerMessageGunKill> type() {
+        return TYPE;
+    }
+
     private final int bulletId;
     private final int killEntityId;
     private final int attackerId;
@@ -60,12 +71,10 @@ public class ServerMessageGunKill {
         return new ServerMessageGunKill(bulletId, killEntityId, attackerId, gunId, gunDisplayId, baseDamage, isHeadShot, headshotMultiplier);
     }
 
-    public static void handle(ServerMessageGunKill message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isClient()) {
+    public static void handle(ServerMessageGunKill message, IPayloadContext context) {
+        if (context.flow().isClientbound()) {
             context.enqueueWork(() -> onKill(message));
         }
-        context.setPacketHandled(true);
     }
 
     @OnlyIn(Dist.CLIENT)

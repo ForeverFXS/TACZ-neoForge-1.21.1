@@ -9,14 +9,25 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.network.NetworkEvent;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import java.util.Objects;
 import java.util.function.Supplier;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ServerMessageSyncBaseTimestamp {
+public class ServerMessageSyncBaseTimestamp implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ServerMessageSyncBaseTimestamp> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "server_message_sync_base_timestamp"));
+    public static final StreamCodec<FriendlyByteBuf, ServerMessageSyncBaseTimestamp> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ServerMessageSyncBaseTimestamp::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ServerMessageSyncBaseTimestamp> type() {
+        return TYPE;
+    }
+
     private static final Marker MARKER = MarkerManager.getMarker("SYNC_BASE_TIMESTAMP");
 
     public ServerMessageSyncBaseTimestamp() { }
@@ -27,14 +38,12 @@ public class ServerMessageSyncBaseTimestamp {
         return new ServerMessageSyncBaseTimestamp();
     }
 
-    public static void handle(ServerMessageSyncBaseTimestamp message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isClient()) {
+    public static void handle(ServerMessageSyncBaseTimestamp message, IPayloadContext context) {
+        if (context.flow().isClientbound()) {
             long timestamp = System.currentTimeMillis();
             context.enqueueWork(() -> updateBaseTimestamp(timestamp));
         }
-        context.setPacketHandled(true);
-        NetworkHandler.CHANNEL.reply(new ClientMessageSyncBaseTimestamp(), context);
+        context.reply(new ClientMessageSyncBaseTimestamp());
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -7,14 +7,26 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+import com.tacz.guns.GunMod;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ClientMessageLaserColor {
+public class ClientMessageLaserColor implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ClientMessageLaserColor> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "client_message_laser_color"));
+    public static final StreamCodec<FriendlyByteBuf, ClientMessageLaserColor> STREAM_CODEC = StreamCodec.of((buf, msg) -> encode(msg, buf), ClientMessageLaserColor::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ClientMessageLaserColor> type() {
+        return TYPE;
+    }
+
     private final Map<AttachmentType, Integer> colorMap = new HashMap<>();
     private boolean applyGunColor = false;
     private int gunColor = 0;
@@ -43,7 +55,7 @@ public class ClientMessageLaserColor {
     }
 
     public static void encode(ClientMessageLaserColor message, FriendlyByteBuf buf) {
-        buf.writeMap(message.colorMap, FriendlyByteBuf::writeEnum, FriendlyByteBuf::writeInt);
+        buf.writeMap(message.colorMap, (buf1, type) -> buf1.writeEnum(type), (buf1, color) -> buf1.writeInt(color));
         buf.writeBoolean(message.applyGunColor);
         buf.writeInt(message.gunColor);
         buf.writeInt(message.gunSlotIndex);
@@ -51,19 +63,17 @@ public class ClientMessageLaserColor {
 
     public static ClientMessageLaserColor decode(FriendlyByteBuf buf) {
         ClientMessageLaserColor message = new ClientMessageLaserColor();
-        message.colorMap.putAll(buf.readMap(buf1 -> buf.readEnum(AttachmentType.class), FriendlyByteBuf::readInt));
+        message.colorMap.putAll(buf.readMap(buf1 -> buf1.readEnum(AttachmentType.class), buf1 -> buf1.readInt()));
         message.applyGunColor = buf.readBoolean();
         message.gunColor = buf.readInt();
         message.gunSlotIndex = buf.readInt();
         return message;
     }
 
-    public static void handle(ClientMessageLaserColor message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        if (context.getDirection().getReceptionSide().isServer()) {
+    public static void handle(ClientMessageLaserColor message, IPayloadContext context) {
+        if (context.flow().isServerbound()) {
             context.enqueueWork(() -> {
-                ServerPlayer player = context.getSender();
-                if (player == null || message.gunSlotIndex == -1) {
+                if (!(context.player() instanceof ServerPlayer player) || message.gunSlotIndex == -1) {
                     return;
                 }
                 Inventory inventory = player.getInventory();
@@ -84,7 +94,6 @@ public class ClientMessageLaserColor {
                 }
             });
         }
-        context.setPacketHandled(true);
     }
 
 }
