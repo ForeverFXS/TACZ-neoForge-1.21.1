@@ -17,7 +17,7 @@ public interface BlockItemDataAccessor extends IBlock {
     @Override
     @NotNull
     default ResourceLocation getBlockId(ItemStack block) {
-        CompoundTag nbt = block.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(block);
         if (nbt.contains(BLOCK_ID, Tag.TAG_STRING)) {
             ResourceLocation gunId = ResourceLocation.tryParse(nbt.getString(BLOCK_ID));
             return Objects.requireNonNullElse(gunId, DefaultAssets.EMPTY_BLOCK_ID);
@@ -27,7 +27,7 @@ public interface BlockItemDataAccessor extends IBlock {
 
     @Override
     default void setBlockId(ItemStack block, @Nullable ResourceLocation blockId) {
-        CompoundTag nbt = block.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(block);
         if (blockId != null) {
             nbt.putString(BLOCK_ID, blockId.toString());
             return;

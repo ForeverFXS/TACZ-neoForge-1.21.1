@@ -19,7 +19,7 @@ public interface AmmoItemDataAccessor extends IAmmo {
     @Override
     @NotNull
     default ResourceLocation getAmmoId(ItemStack ammo) {
-        CompoundTag nbt = ammo.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(ammo);
         if (nbt.contains(AMMO_ID_TAG, Tag.TAG_STRING)) {
             ResourceLocation gunId = ResourceLocation.tryParse(nbt.getString(AMMO_ID_TAG));
             return Objects.requireNonNullElse(gunId, DefaultAssets.EMPTY_AMMO_ID);
@@ -29,7 +29,7 @@ public interface AmmoItemDataAccessor extends IAmmo {
 
     @Override
     default void setAmmoId(ItemStack ammo, @Nullable ResourceLocation ammoId) {
-        CompoundTag nbt = ammo.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(ammo);
         if (ammoId != null) {
             nbt.putString(AMMO_ID_TAG, ammoId.toString());
             return;

@@ -51,13 +51,13 @@ public interface AttachmentItemDataAccessor extends IAttachment {
     @Override
     @NotNull
     default ResourceLocation getAttachmentId(ItemStack attachmentStack) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         return getAttachmentIdFromTag(nbt);
     }
 
     @Override
     default void setAttachmentId(ItemStack attachmentStack, @Nullable ResourceLocation attachmentId) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         if (attachmentId != null) {
             nbt.putString(ATTACHMENT_ID_TAG, attachmentId.toString());
         }
@@ -66,7 +66,7 @@ public interface AttachmentItemDataAccessor extends IAttachment {
     @Override
     @Nullable
     default ResourceLocation getSkinId(ItemStack attachmentStack) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         if (nbt.contains(SKIN_ID_TAG, Tag.TAG_STRING)) {
             return ResourceLocation.tryParse(nbt.getString(SKIN_ID_TAG));
         }
@@ -75,7 +75,7 @@ public interface AttachmentItemDataAccessor extends IAttachment {
 
     @Override
     default void setSkinId(ItemStack attachmentStack, @Nullable ResourceLocation skinId) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         if (skinId != null) {
             nbt.putString(SKIN_ID_TAG, skinId.toString());
         } else {
@@ -85,25 +85,25 @@ public interface AttachmentItemDataAccessor extends IAttachment {
 
     @Override
     default int getZoomNumber(ItemStack attachmentStack) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         return getZoomNumberFromTag(nbt);
     }
 
     @Override
     default void setZoomNumber(ItemStack attachmentStack, int zoomNumber) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         setZoomNumberToTag(nbt, zoomNumber);
     }
 
     @Override
     default boolean hasCustomLaserColor(ItemStack attachmentStack) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         return nbt.contains(LASER_COLOR_TAG, Tag.TAG_INT);
     }
 
     @Override
     default int getLaserColor(ItemStack attachmentStack) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         if (!hasCustomLaserColor(attachmentStack)) {
             return 0xFF0000;
         }
@@ -112,7 +112,7 @@ public interface AttachmentItemDataAccessor extends IAttachment {
 
     @Override
     default void setLaserColor(ItemStack attachmentStack, int color) {
-        CompoundTag nbt = attachmentStack.getOrCreateTag();
+        CompoundTag nbt = ItemNbtHelper.getOrCreateTag(attachmentStack);
         nbt.putInt(LASER_COLOR_TAG, color);
     }
 }
