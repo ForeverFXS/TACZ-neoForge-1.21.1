@@ -6,8 +6,8 @@ import com.tacz.guns.config.common.OtherConfig;
 import com.tacz.guns.init.ModBlocks;
 import com.tacz.guns.init.ModSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.Nullable;
@@ -62,31 +61,49 @@ public class TargetBlockEntity extends BlockEntity implements Nameable {
 
     public void setOwner(@Nullable GameProfile owner) {
         this.owner = owner;
-        SkullBlockEntity.updateGameprofile(this.owner, gameProfile -> {
-            this.owner = gameProfile;
+        if (owner == null) {
             this.refresh();
-        });
+            return;
+        }
+        // 1.21 移除了 SkullBlockEntity.updateGameprofile，改用 fetchGameProfile 按 id / name 补全
+        var future = owner.getId() != null
+                ? SkullBlockEntity.fetchGameProfile(owner.getId())
+                : SkullBlockEntity.fetchGameProfile(owner.getName());
+        future.thenAccept(optional -> optional.ifPresent(profile -> {
+            this.owner = profile;
+            this.refresh();
+        }));
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains(OWNER_TAG, Tag.TAG_COMPOUND)) {
-            this.owner = NbtUtils.readGameProfile(tag.getCompound(OWNER_TAG));
+            CompoundTag ownerTag = tag.getCompound(OWNER_TAG);
+            String ownerName = ownerTag.getString("Name");
+            if (!ownerName.isEmpty()) {
+                var ownerId = ownerTag.hasUUID("Id") ? ownerTag.getUUID("Id") : null;
+                this.owner = new GameProfile(ownerId, ownerName);
+            }
         }
         if (tag.contains(CUSTOM_NAME_TAG, Tag.TAG_STRING)) {
-            this.name = Component.Serializer.fromJson(tag.getString(CUSTOM_NAME_TAG));
+            this.name = Component.Serializer.fromJson(tag.getString(CUSTOM_NAME_TAG), registries);
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         if (owner != null) {
-            tag.put(OWNER_TAG, NbtUtils.writeGameProfile(new CompoundTag(), owner));
+            CompoundTag ownerTag = new CompoundTag();
+            ownerTag.putString("Name", owner.getName());
+            if (owner.getId() != null) {
+                ownerTag.putUUID("Id", owner.getId());
+            }
+            tag.put(OWNER_TAG, ownerTag);
         }
         if (this.name != null) {
-            tag.putString(CUSTOM_NAME_TAG, Component.Serializer.toJson(this.name));
+            tag.putString(CUSTOM_NAME_TAG, Component.Serializer.toJson(this.name, registries));
         }
     }
 
@@ -111,8 +128,8 @@ public class TargetBlockEntity extends BlockEntity implements Nameable {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
     }
 
     public void refresh() {
@@ -123,10 +140,6 @@ public class TargetBlockEntity extends BlockEntity implements Nameable {
         }
     }
 
-    @Override
-    public AABB getRenderBoundingBox() {
-        return new AABB(worldPosition.offset(-2, 0, -2), worldPosition.offset(2, 2, 2));
-    }
 
     public void hit(Level level, BlockState state, BlockHitResult hit, boolean isUpperBlock) {
         if (this.level != null && state.getValue(STAND)) {

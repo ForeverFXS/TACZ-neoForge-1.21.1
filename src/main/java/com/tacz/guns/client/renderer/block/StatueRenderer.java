@@ -24,6 +24,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 
 public class StatueRenderer implements BlockEntityRenderer<StatueBlockEntity> {
     public StatueRenderer(BlockEntityRendererProvider.Context context) {
@@ -31,6 +33,12 @@ public class StatueRenderer implements BlockEntityRenderer<StatueBlockEntity> {
 
     public static Optional<BedrockModel> getModel() {
         return InternalAssetLoader.getBedrockModel(InternalAssetLoader.STATUE_MODEL_LOCATION);
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(StatueBlockEntity blockEntity) {
+        BlockPos pos = blockEntity.getBlockPos();
+        return AABB.encapsulatingFullBlocks(pos.offset(-2, 0, -2), pos.offset(2, 2, 2));
     }
 
     @Override

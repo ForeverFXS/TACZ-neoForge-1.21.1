@@ -21,6 +21,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 
 public class GunSmithTableRenderer implements BlockEntityRenderer<GunSmithTableBlockEntity> {
     public GunSmithTableRenderer(BlockEntityRendererProvider.Context context) {
@@ -43,6 +45,12 @@ public class GunSmithTableRenderer implements BlockEntityRenderer<GunSmithTableB
             return TimelessAPI.getClientBlockIndex(id);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(GunSmithTableBlockEntity blockEntity) {
+        BlockPos pos = blockEntity.getBlockPos();
+        return AABB.encapsulatingFullBlocks(pos.offset(-2, 0, -2), pos.offset(2, 1, 2));
     }
 
     @Override

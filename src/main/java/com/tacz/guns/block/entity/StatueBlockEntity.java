@@ -3,6 +3,7 @@ package com.tacz.guns.block.entity;
 import com.tacz.guns.init.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -15,7 +16,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 
 import static com.tacz.guns.block.StatueBlock.FACING;
 
@@ -71,30 +71,26 @@ public class StatueBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains(ITEM_TAG, Tag.TAG_COMPOUND)) {
-            this.gunItem = ItemStack.of(tag.getCompound(ITEM_TAG));
+            this.gunItem = ItemStack.parseOptional(registries, tag.getCompound(ITEM_TAG));
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        tag.put(ITEM_TAG, gunItem.save(new CompoundTag()));
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.put(ITEM_TAG, gunItem.saveOptional(registries));
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        CompoundTag tag = super.getUpdateTag();
-        tag.put(ITEM_TAG, gunItem.save(new CompoundTag()));
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        tag.put(ITEM_TAG, gunItem.saveOptional(registries));
         return tag;
     }
 
-    @Override
-    public AABB getRenderBoundingBox() {
-        return new AABB(worldPosition.offset(-2, 0, -2), worldPosition.offset(2, 2, 2));
-    }
 
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {

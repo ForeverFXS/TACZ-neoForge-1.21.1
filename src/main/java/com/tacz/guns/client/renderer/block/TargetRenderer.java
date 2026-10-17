@@ -24,6 +24,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 
 public class TargetRenderer implements BlockEntityRenderer<TargetBlockEntity> {
     private static final String UPPER_NAME = "target_upper";
@@ -34,6 +36,12 @@ public class TargetRenderer implements BlockEntityRenderer<TargetBlockEntity> {
 
     public static Optional<BedrockModel> getModel() {
         return InternalAssetLoader.getBedrockModel(InternalAssetLoader.TARGET_MODEL_LOCATION);
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(TargetBlockEntity blockEntity) {
+        BlockPos pos = blockEntity.getBlockPos();
+        return AABB.encapsulatingFullBlocks(pos.offset(-2, 0, -2), pos.offset(2, 2, 2));
     }
 
     @Override
