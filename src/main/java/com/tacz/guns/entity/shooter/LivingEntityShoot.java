@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.neoforged.fml.LogicalSide;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Objects;
 import java.util.Optional;

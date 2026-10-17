@@ -2,7 +2,7 @@ package com.tacz.guns.client.resource.serialize;
 
 import com.google.gson.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.crafting.CraftingHelper;
+import net.neoforged.neoforge.common.crafting.CraftingHelper;
 
 import java.lang.reflect.Type;
 

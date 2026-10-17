@@ -64,7 +64,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.common.NeoForge;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.entity.PartEntity;
+import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.fml.DistExecutor;
 import net.neoforged.fml.LogicalSide;
 import net.minecraftforge.network.NetworkHooks;

@@ -37,7 +37,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.luaj.vm2.LuaTable;
