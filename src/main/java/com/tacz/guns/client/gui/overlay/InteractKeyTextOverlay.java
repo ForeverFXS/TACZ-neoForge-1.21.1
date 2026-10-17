@@ -21,14 +21,20 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.LayeredDraw;
 import org.apache.commons.lang3.StringUtils;
 
-public class InteractKeyTextOverlay implements IGuiOverlay {
+public class InteractKeyTextOverlay implements LayeredDraw.Layer {
 
     @Override
-    public void render(ForgeGui gui, GuiGraphics graphics, float partialTick, int width, int height) {
+    public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
+        Gui gui = Minecraft.getInstance().gui;
+        int width = graphics.guiWidth();
+        int height = graphics.guiHeight();
+        float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
         if (RenderConfig.DISABLE_INTERACT_HUD_TEXT.get()) {
             return;
         }

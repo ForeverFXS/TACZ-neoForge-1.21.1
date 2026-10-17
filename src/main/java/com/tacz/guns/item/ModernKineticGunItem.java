@@ -292,7 +292,7 @@ public class ModernKineticGunItem extends AbstractGunItem implements GunItemData
     public final DefaultPropertyModification defaultPropertyModification = new DefaultPropertyModification();
 
     public class DefaultPropertyModification {
-        public static final ResourceLocation SLUGS = new ResourceLocation(GunMod.MOD_ID, "intrinsic/slug");
+        public static final ResourceLocation SLUGS = ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "intrinsic/slug");
 
         @SuppressWarnings("unchecked")
         public <T> T modify(ItemStack gunItem, LivingEntity shooter, CommonGunIndex gunIndex,

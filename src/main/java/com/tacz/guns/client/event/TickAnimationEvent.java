@@ -9,7 +9,10 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -17,7 +20,7 @@ import net.neoforged.fml.common.Mod;
 @EventBusSubscriber(value = Dist.CLIENT, modid = GunMod.MOD_ID)
 public class TickAnimationEvent {
     @SubscribeEvent
-    public static void tickAnimation(TickEvent.ClientTickEvent event) {
+    public static void tickAnimation(ClientTickEvent.Post event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
             return;
@@ -45,8 +48,8 @@ public class TickAnimationEvent {
     }
 
     @SubscribeEvent
-    public static void tickAnimation(TickEvent.RenderTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
+    public static void tickAnimation(RenderFrameEvent.Pre event) {
+        {
             return;
         }
         if (Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
@@ -61,7 +64,7 @@ public class TickAnimationEvent {
         if (IClientItemExtensions.of(mainHandItem.getItem()).getCustomRenderer() instanceof AnimateGeoItemRenderer<?, ?> renderer) {
             // 如果物品不一样了，先尝试初始化状态机
             if (renderer.needReInit(mainHandItem)) {
-                renderer.tryInit(mainHandItem, player, event.renderTickTime);
+                renderer.tryInit(mainHandItem, player, event.getPartialTick().getGameTimeDeltaPartialTick(true));
             }
             renderer.visualUpdate(mainHandItem);
         }

@@ -20,7 +20,7 @@ public interface AmmoBoxItemDataAccessor extends IAmmoBox {
     default ResourceLocation getAmmoId(ItemStack ammoBox) {
         CompoundTag tag = ammoBox.getOrCreateTag();
         if (tag.contains(AMMO_ID_TAG, Tag.TAG_STRING)) {
-            return new ResourceLocation(tag.getString(AMMO_ID_TAG));
+            return ResourceLocation.parse(tag.getString(AMMO_ID_TAG));
         }
         return DefaultAssets.EMPTY_AMMO_ID;
     }

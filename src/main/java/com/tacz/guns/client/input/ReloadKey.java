@@ -12,10 +12,13 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyModifier;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -67,8 +70,8 @@ public class ReloadKey {
 
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
-    public static void autoReload(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.START || event.side != LogicalSide.CLIENT) {
+    public static void autoReload(PlayerTickEvent.Post event) {
+        if (!event.getEntity().level().isClientSide()) {
             return;
         }
 

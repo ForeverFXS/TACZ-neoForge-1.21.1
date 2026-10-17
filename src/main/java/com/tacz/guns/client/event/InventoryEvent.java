@@ -11,8 +11,11 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -27,7 +30,7 @@ public class InventoryEvent {
     private static ItemStack oldHotbarSelectItem = ItemStack.EMPTY;
 
     @SubscribeEvent
-    public static void onPlayerChangeSelect(TickEvent.ClientTickEvent event) {
+    public static void onPlayerChangeSelect(ClientTickEvent.Post event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
             return;
@@ -60,7 +63,7 @@ public class InventoryEvent {
         if (!ItemStack.matches(oldHotbarSelectItem, currentItem)) {
             oldHotbarSelectItem = currentItem.copy();
         }
-        if (event.phase == TickEvent.Phase.END) {
+        {
             if (player.tickCount % HOTBAR_WARM_UP_INTERVAL_TICKS == 0) {
                 ClientIndexManager.warmUpEquippedAndHotbarModels();
             }

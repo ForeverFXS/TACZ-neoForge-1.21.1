@@ -54,14 +54,14 @@ public class BulletHoleParticle extends TextureSheetParticle {
         if (state.is(ModBlocks.TARGET.get()) || shouldRemove()) {
             this.remove();
         }
-        TimelessAPI.getGunDisplay(new ResourceLocation(gunDisplayId), new ResourceLocation(gunId)).ifPresent(gunIndex -> {
+        TimelessAPI.getGunDisplay(ResourceLocation.parse(gunDisplayId), ResourceLocation.parse(gunId)).ifPresent(gunIndex -> {
             float[] gunTracerColor = gunIndex.getTracerColor();
             if (gunTracerColor != null) {
                 this.rCol = gunTracerColor[0];
                 this.gCol = gunTracerColor[1];
                 this.bCol = gunTracerColor[2];
             } else {
-                TimelessAPI.getClientAmmoIndex(new ResourceLocation(ammoId)).ifPresent(ammoIndex -> {
+                TimelessAPI.getClientAmmoIndex(ResourceLocation.parse(ammoId)).ifPresent(ammoIndex -> {
                     float[] ammoTracerColor = ammoIndex.getTracerColor();
                     this.rCol = ammoTracerColor[0];
                     this.gCol = ammoTracerColor[1];

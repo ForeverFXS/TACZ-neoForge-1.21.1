@@ -17,7 +17,10 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyModifier;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -38,8 +41,8 @@ public class ShootKey {
     private static boolean controllerShootDown = false;
 
     @SubscribeEvent
-    public static void autoShoot(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || !isInGame()) {
+    public static void autoShoot(ClientTickEvent.Post event) {
+        if (!isInGame()) {
             return;
         }
         LocalPlayerSprint.stopSprint = false;

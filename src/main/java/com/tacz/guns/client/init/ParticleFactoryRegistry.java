@@ -4,7 +4,7 @@ import com.tacz.guns.GunMod;
 import com.tacz.guns.client.particle.BulletHoleParticle;
 import com.tacz.guns.init.ModParticles;
 import net.neoforged.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;

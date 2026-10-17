@@ -75,7 +75,7 @@ public class TimelessItemWrapper {
 
         private ItemIndexInfo(String pNamespace, String pParent, String pPath) {
             this.parent = (isTypeValid(pParent)) ? pParent : FALL_BACK;
-            this.indexId = new ResourceLocation(pNamespace, pPath);
+            this.indexId = ResourceLocation.fromNamespaceAndPath(pNamespace, pPath);
         }
 
         private ItemIndexInfo(String pParent, ResourceLocation pLocation) {
@@ -96,7 +96,7 @@ public class TimelessItemWrapper {
         }
 
         public static ItemIndexInfo create(String pLocation) {
-            ResourceLocation id = new ResourceLocation(pLocation);
+            ResourceLocation id = ResourceLocation.parse(pLocation);
             return createFromResourceLocation(id);
         }
 

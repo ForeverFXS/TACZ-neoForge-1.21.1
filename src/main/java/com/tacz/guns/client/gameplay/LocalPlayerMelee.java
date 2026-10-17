@@ -16,7 +16,7 @@ import com.tacz.guns.resource.pojo.data.gun.GunDefaultMeleeData;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.LogicalSide;
 
 import org.jetbrains.annotations.Nullable;
@@ -80,7 +80,7 @@ public class LocalPlayerMelee {
         data.lockState(operator -> operator.getSynMeleeCoolDown() > 0);
         // 触发近战事件
         GunMeleeEvent gunMeleeEvent = new GunMeleeEvent(player, player.getMainHandItem(), LogicalSide.CLIENT);
-        return !MinecraftForge.EVENT_BUS.post(gunMeleeEvent);
+        return !NeoForge.EVENT_BUS.post(gunMeleeEvent);
     }
 
     private void doMuzzleMelee(GunDisplayInstance display) {

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -54,7 +54,7 @@ public class ServerMessageGunDraw {
         }
         if (level.getEntity(message.entityId) instanceof LivingEntity livingEntity) {
             GunDrawEvent gunDrawEvent = new GunDrawEvent(livingEntity, message.previousGunItem, message.currentGunItem, LogicalSide.CLIENT);
-            MinecraftForge.EVENT_BUS.post(gunDrawEvent);
+            NeoForge.EVENT_BUS.post(gunDrawEvent);
         }
     }
 }

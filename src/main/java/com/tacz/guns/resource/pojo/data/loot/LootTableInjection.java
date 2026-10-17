@@ -31,10 +31,10 @@ public record LootTableInjection(List<ResourceLocation> lootTables, LootTable lo
         List<ResourceLocation> lootTables = new ArrayList<>();
         if (object.has("loot_tables")) {
             for (JsonElement table : GsonHelper.getAsJsonArray(object, "loot_tables")) {
-                lootTables.add(new ResourceLocation(GsonHelper.convertToString(table, "loot table")));
+                lootTables.add(ResourceLocation.parse(GsonHelper.convertToString(table, "loot table")));
             }
         } else if (object.has("loot_table")) {
-            lootTables.add(new ResourceLocation(GsonHelper.getAsString(object, "loot_table")));
+            lootTables.add(ResourceLocation.parse(GsonHelper.getAsString(object, "loot_table")));
         } else {
             throw new JsonParseException("Loot injection " + fileId + " must define loot_table or loot_tables");
         }

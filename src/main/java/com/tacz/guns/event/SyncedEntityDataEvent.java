@@ -8,10 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.AttachCapabilitiesEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -29,7 +32,7 @@ public final class SyncedEntityDataEvent {
     public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (SyncedEntityData.instance().hasSyncedDataKey(event.getObject())) {
             DataHolderCapabilityProvider provider = new DataHolderCapabilityProvider();
-            event.addCapability(new ResourceLocation(GunMod.MOD_ID, "synced_entity_data"), provider);
+            event.addCapability(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "synced_entity_data"), provider);
             // Don't add invalidate to server player since it's persistent
             if (!(event.getObject() instanceof ServerPlayer)) {
                 event.addListener(provider::invalidate);
@@ -88,14 +91,9 @@ public final class SyncedEntityDataEvent {
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
+    public static void onServerTick(ServerTickEvent.Post event) {
         SyncedEntityData instance = SyncedEntityData.instance();
-        if (event.side != LogicalSide.SERVER) {
-            return;
-        }
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+ 
         if (!instance.isDirty()) {
             return;
         }

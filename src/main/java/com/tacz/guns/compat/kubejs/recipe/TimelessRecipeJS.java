@@ -151,7 +151,7 @@ public class TimelessRecipeJS extends RecipeJS {
     }
 
     private ResourceLocation getIdFromJson(JsonObject jsonObject) {
-        return new ResourceLocation(GsonHelper.getAsString(jsonObject, "id"));
+        return ResourceLocation.parse(GsonHelper.getAsString(jsonObject, "id"));
     }
 
     private String getGunTypeFromJson(JsonObject jsonObject) {

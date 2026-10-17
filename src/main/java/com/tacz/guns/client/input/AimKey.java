@@ -10,10 +10,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyModifier;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -64,7 +67,7 @@ public class AimKey {
      * 建议将按下切换瞄准也支持 键盘按键输入
      * */
     @SubscribeEvent
-    public static void onAimHoldingPreInput(TickEvent.ClientTickEvent event) {
+    public static void onAimHoldingPreInput(ClientTickEvent.Pre event) {
         if (!KeyConfig.HOLD_TO_AIM.get()) {
             return;
         }
@@ -122,10 +125,7 @@ public class AimKey {
     }
 
     @SubscribeEvent
-    public static void cancelAim(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
+    public static void cancelAim(ClientTickEvent.Post event) { 
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (!(player instanceof IClientPlayerGunOperator operator)) {

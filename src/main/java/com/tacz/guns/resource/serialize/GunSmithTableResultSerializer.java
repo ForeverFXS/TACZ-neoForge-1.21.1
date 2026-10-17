@@ -71,6 +71,6 @@ public class GunSmithTableResultSerializer implements JsonDeserializer<GunSmithT
     }
 
     private ResourceLocation getId(JsonObject jsonObject) {
-        return new ResourceLocation(GsonHelper.getAsString(jsonObject, "id"));
+        return ResourceLocation.parse(GsonHelper.getAsString(jsonObject, "id"));
     }
 }

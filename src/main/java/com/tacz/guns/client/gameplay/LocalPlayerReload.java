@@ -18,7 +18,7 @@ import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.LogicalSide;
 
 public class LocalPlayerReload {
@@ -82,7 +82,7 @@ public class LocalPlayerReload {
             data.lockState(operator -> operator.getSynReloadState().getStateType().isReloading());
             data.chargeProgress = 0f;
             // 触发换弹事件
-            if (MinecraftForge.EVENT_BUS.post(new GunReloadEvent(player, player.getMainHandItem(), LogicalSide.CLIENT))) {
+            if (NeoForge.EVENT_BUS.post(new GunReloadEvent(player, player.getMainHandItem(), LogicalSide.CLIENT))) {
                 return;
             }
             // 发包通知服务器

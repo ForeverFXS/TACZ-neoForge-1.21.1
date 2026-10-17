@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -50,7 +50,7 @@ public class ServerMessageGunFireSelect {
         }
         if (level.getEntity(message.shooterId) instanceof LivingEntity shooter) {
             GunFireSelectEvent gunFireSelectEvent = new GunFireSelectEvent(shooter, message.gunItemStack, LogicalSide.CLIENT);
-            MinecraftForge.EVENT_BUS.post(gunFireSelectEvent);
+            NeoForge.EVENT_BUS.post(gunFireSelectEvent);
         }
     }
 }

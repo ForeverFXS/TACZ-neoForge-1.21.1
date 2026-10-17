@@ -178,7 +178,7 @@ public class GunPackList extends ContainerObjectSelectionList<GunPackList.Entry>
     }
 
     public static class Checkbox extends AbstractButton {
-        private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/checkbox.png");
+        private static final ResourceLocation TEXTURE = ResourceLocation.parse("textures/gui/checkbox.png");
         protected boolean selected;
         protected final boolean showLabel;
         private String id;
