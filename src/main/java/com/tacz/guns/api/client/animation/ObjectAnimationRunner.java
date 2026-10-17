@@ -3,12 +3,12 @@ package com.tacz.guns.api.client.animation;
 import com.tacz.guns.util.math.MathUtil;
 import net.minecraft.client.Minecraft;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class ObjectAnimationRunner {
-    @Nonnull
+    @NotNull
     private final ObjectAnimation animation;
     protected long transitionTimeNs;
     /**
@@ -43,11 +43,11 @@ public class ObjectAnimationRunner {
     private ObjectAnimationRunner transitionTo;
     private long transitionProgressNs;
 
-    public ObjectAnimationRunner(@Nonnull ObjectAnimation animation) {
+    public ObjectAnimationRunner(@NotNull ObjectAnimation animation) {
         this.animation = Objects.requireNonNull(animation);
     }
 
-    public @Nonnull ObjectAnimation getAnimation() {
+    public @NotNull ObjectAnimation getAnimation() {
         return animation;
     }
 

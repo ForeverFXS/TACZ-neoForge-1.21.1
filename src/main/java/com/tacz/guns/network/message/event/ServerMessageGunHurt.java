@@ -13,7 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.neoforged.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.function.Supplier;
 
 public class ServerMessageGunHurt {

@@ -17,8 +17,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public interface GunItemDataAccessor extends IGun {
@@ -102,7 +101,7 @@ public interface GunItemDataAccessor extends IGun {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     default ResourceLocation getGunId(ItemStack gun) {
         CompoundTag nbt = gun.getOrCreateTag();
         if (nbt.contains(GUN_ID_TAG, Tag.TAG_STRING)) {
@@ -256,7 +255,7 @@ public interface GunItemDataAccessor extends IGun {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     default ItemStack getAttachment(ItemStack gun, AttachmentType type) {
         if (!allowAttachmentType(gun, type)) {
             return ItemStack.EMPTY;
@@ -287,7 +286,7 @@ public interface GunItemDataAccessor extends IGun {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     default ResourceLocation getAttachmentId(ItemStack gun, AttachmentType type) {
         CompoundTag attachmentTag = this.getAttachmentTag(gun, type);
         if (attachmentTag != null) {
@@ -297,7 +296,7 @@ public interface GunItemDataAccessor extends IGun {
     }
 
     @Override
-    default void installAttachment(@Nonnull ItemStack gun, @Nonnull ItemStack attachment) {
+    default void installAttachment(@NotNull ItemStack gun, @NotNull ItemStack attachment) {
         if (!allowAttachment(gun, attachment)) {
             return;
         }
@@ -313,7 +312,7 @@ public interface GunItemDataAccessor extends IGun {
     }
 
     @Override
-    default void unloadAttachment(@Nonnull ItemStack gun, AttachmentType type) {
+    default void unloadAttachment(@NotNull ItemStack gun, AttachmentType type) {
         if (!allowAttachmentType(gun, type)) {
             return;
         }

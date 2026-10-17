@@ -2,7 +2,7 @@ package com.tacz.guns.resource.pojo.data.gun;
 
 import com.google.gson.annotations.SerializedName;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class GunMeleeData {
     @SerializedName("distance")

@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.tacz.guns.api.modifier.JsonProperty;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public class AttachmentData {

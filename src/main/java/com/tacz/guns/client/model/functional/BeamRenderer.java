@@ -26,14 +26,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class BeamRenderer  {
     public static final ResourceLocation LASER_BEAM_TEXTURE = new ResourceLocation(GunMod.MOD_ID, "textures/entity/beam.png");
     private static final LaserConfig DEFAULT_LASER_CONFIG = new LaserConfig();
 
-    public static void renderLaserBeam(ItemStack stack, PoseStack poseStack, ItemDisplayContext transformType, @Nonnull List<BedrockPart> path) {
+    public static void renderLaserBeam(ItemStack stack, PoseStack poseStack, ItemDisplayContext transformType, @NotNull List<BedrockPart> path) {
         if (stack == null || !transformType.firstPerson() && !(transformType == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND)) {
             return;
         }
@@ -64,7 +64,7 @@ public class BeamRenderer  {
         poseStack.popPose();
     }
 
-	public static boolean renderLaserBeamAccelerated(ItemStack stack, PoseStack poseStack, ItemDisplayContext transformType, @Nonnull List<BedrockPart> path) {
+	public static boolean renderLaserBeamAccelerated(ItemStack stack, PoseStack poseStack, ItemDisplayContext transformType, @NotNull List<BedrockPart> path) {
 		// 获取VertexConsumer拓展方法
 		var builder = Minecraft
 				.getInstance()

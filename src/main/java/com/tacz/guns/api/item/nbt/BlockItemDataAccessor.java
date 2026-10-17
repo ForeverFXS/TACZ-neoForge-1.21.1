@@ -7,15 +7,15 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public interface BlockItemDataAccessor extends IBlock {
     String BLOCK_ID = "BlockId";
 
     @Override
-    @Nonnull
+    @NotNull
     default ResourceLocation getBlockId(ItemStack block) {
         CompoundTag nbt = block.getOrCreateTag();
         if (nbt.contains(BLOCK_ID, Tag.TAG_STRING)) {

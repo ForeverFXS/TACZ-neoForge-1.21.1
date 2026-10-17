@@ -4,8 +4,8 @@ import com.tacz.guns.api.item.attachment.AttachmentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface IAttachment {
     /**
@@ -25,7 +25,7 @@ public interface IAttachment {
     /**
      * 获取配件 ID
      */
-    @Nonnull
+    @NotNull
     ResourceLocation getAttachmentId(ItemStack attachmentStack);
 
     /**
@@ -57,7 +57,7 @@ public interface IAttachment {
     /**
      * 配件类型
      */
-    @Nonnull
+    @NotNull
     AttachmentType getType(ItemStack attachmentStack);
 
     boolean hasCustomLaserColor(ItemStack attachmentStack);

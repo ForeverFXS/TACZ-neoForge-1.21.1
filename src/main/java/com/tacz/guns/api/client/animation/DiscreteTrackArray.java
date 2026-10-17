@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 
 public class DiscreteTrackArray implements Iterable<Integer>{
@@ -62,7 +61,7 @@ public class DiscreteTrackArray implements Iterable<Integer>{
     }
 
     @UnmodifiableView
-    public @Nonnull List<Integer> getByIndex(int index) {
+    public @NotNull List<Integer> getByIndex(int index) {
         LinkedList<Integer> list = tracks.get(index);
         if(list == null) {
             return Collections.emptyList();

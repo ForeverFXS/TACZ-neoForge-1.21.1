@@ -18,8 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.ICancellableEvent;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GunKubeJSEvents {
     public static final EventGroup GROUP = EventGroup.of("TimelessGunEvents");
@@ -36,7 +36,7 @@ public class GunKubeJSEvents {
             return event;
         }
 
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return ItemStack.EMPTY;
         };
@@ -70,7 +70,7 @@ public class GunKubeJSEvents {
         }
 
         @Override
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return event.getGunItem();
         }
@@ -133,7 +133,7 @@ public class GunKubeJSEvents {
         }
 
         @Override
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return event.getCurrentGunItem();
         }
@@ -150,7 +150,7 @@ public class GunKubeJSEvents {
             super(event);
         }
 
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return event.getGunItemStack();
         }
@@ -168,7 +168,7 @@ public class GunKubeJSEvents {
         }
 
         @Override
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return event.getGunItemStack();
         }
@@ -186,7 +186,7 @@ public class GunKubeJSEvents {
         }
 
         @Override
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return event.getGunItemStack();
         }
@@ -204,7 +204,7 @@ public class GunKubeJSEvents {
         }
 
         @Override
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return event.getGunItemStack();
         }
@@ -222,7 +222,7 @@ public class GunKubeJSEvents {
         }
 
         @Override
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return event.getGunItemStack();
         }
@@ -240,7 +240,7 @@ public class GunKubeJSEvents {
         }
 
         @Override
-        @Nonnull
+        @NotNull
         protected ItemStack getEventItemStack() {
             return event.getGunItemStack();
         }

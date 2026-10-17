@@ -5,7 +5,7 @@ import com.tacz.guns.client.model.bedrock.BedrockPart;
 import com.tacz.guns.client.resource.pojo.model.BedrockModelPOJO;
 import com.tacz.guns.client.resource.pojo.model.BedrockVersion;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class BedrockAmmoModel extends BedrockModel {

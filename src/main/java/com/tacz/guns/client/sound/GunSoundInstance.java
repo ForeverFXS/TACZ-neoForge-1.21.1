@@ -13,7 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class GunSoundInstance extends AbstractSoundInstance {
     private static final FileToIdConverter TACZ_SOUND_LISTER = new FileToIdConverter("tacz_sounds", ".ogg");

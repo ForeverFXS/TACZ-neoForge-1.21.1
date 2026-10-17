@@ -7,7 +7,7 @@ import com.tacz.guns.client.model.bedrock.BedrockPart;
 import com.tacz.guns.client.resource.pojo.model.BonesItem;
 import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import static com.tacz.guns.client.model.BedrockAnimatedModel.CONSTRAINT_NODE;
 

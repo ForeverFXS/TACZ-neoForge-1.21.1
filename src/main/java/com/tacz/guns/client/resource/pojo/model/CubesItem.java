@@ -5,7 +5,7 @@ import com.google.gson.*;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Type;
 import java.util.List;
 

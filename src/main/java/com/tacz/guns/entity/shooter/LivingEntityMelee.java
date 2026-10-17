@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.neoforged.fml.LogicalSide;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class LivingEntityMelee {

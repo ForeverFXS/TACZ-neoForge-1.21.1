@@ -39,8 +39,8 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -253,7 +253,7 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
 
 
     @Override
-    public void renderByItem(@Nonnull ItemStack stack, @Nonnull ItemDisplayContext transformType, @Nonnull PoseStack poseStack, @Nonnull MultiBufferSource pBuffer,
+    public void renderByItem(@NotNull ItemStack stack, @NotNull ItemDisplayContext transformType, @NotNull PoseStack poseStack, @NotNull MultiBufferSource pBuffer,
                              int pPackedLight, int pPackedOverlay) {
         if (!(stack.getItem() instanceof IGun)) {
             return;

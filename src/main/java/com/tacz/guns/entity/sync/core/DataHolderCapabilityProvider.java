@@ -11,8 +11,8 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DataHolderCapabilityProvider implements ICapabilitySerializable<ListTag> {
     public static final Capability<DataHolder> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
@@ -61,9 +61,9 @@ public class DataHolderCapabilityProvider implements ICapabilitySerializable<Lis
         });
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         return CAPABILITY.orEmpty(cap, this.optional);
     }
 }

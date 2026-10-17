@@ -21,7 +21,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -56,9 +55,9 @@ public class GunSmithTableItem extends BlockItem implements BlockItemDataAccesso
     }
 
     @Override
-    @Nonnull
+    @NotNull
     @OnlyIn(Dist.CLIENT)
-    public Component getName(@Nonnull ItemStack stack) {
+    public Component getName(@NotNull ItemStack stack) {
         ResourceLocation blockId = this.getBlockId(stack);
         Optional<ClientBlockIndex> blockIndex = TimelessAPI.getClientBlockIndex(blockId);
         if (blockIndex.isPresent()) {

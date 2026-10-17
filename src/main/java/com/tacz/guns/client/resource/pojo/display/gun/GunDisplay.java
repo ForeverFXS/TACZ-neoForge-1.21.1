@@ -8,7 +8,7 @@ import com.tacz.guns.client.resource.pojo.display.LaserConfig;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;

@@ -33,7 +33,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -315,9 +315,9 @@ public abstract class AbstractGunItem extends Item implements IGun, IAnimationIt
      * 获取枪械的显示名称
      */
     @Override
-    @Nonnull
+    @NotNull
     @OnlyIn(Dist.CLIENT)
-    public Component getName(@Nonnull ItemStack stack) {
+    public Component getName(@NotNull ItemStack stack) {
         ResourceLocation gunId = this.getGunId(stack);
         Optional<ClientGunIndex> gunIndex = TimelessAPI.getClientGunIndex(gunId);
         if (gunIndex.isPresent()) {
@@ -377,7 +377,7 @@ public abstract class AbstractGunItem extends Item implements IGun, IAnimationIt
      * 获取在 Tooltip 中渲染的图片
      */
     @Override
-    @Nonnull
+    @NotNull
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
         if (stack.getItem() instanceof IGun iGun) {
             Optional<CommonGunIndex> optional = TimelessAPI.getCommonGunIndex(this.getGunId(stack));

@@ -2,7 +2,7 @@ package com.tacz.guns.entity.sync.core;
 
 import net.minecraft.world.entity.Entity;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -25,7 +25,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +47,9 @@ public class AmmoItem extends Item implements AmmoItemDataAccessor {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     @OnlyIn(Dist.CLIENT)
-    public Component getName(@Nonnull ItemStack stack) {
+    public Component getName(@NotNull ItemStack stack) {
         ResourceLocation ammoId = this.getAmmoId(stack);
         Optional<ClientAmmoIndex> ammoIndex = TimelessAPI.getClientAmmoIndex(ammoId);
         if (ammoIndex.isPresent()) {

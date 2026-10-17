@@ -16,8 +16,8 @@ import com.tacz.guns.client.resource.pojo.model.BedrockVersion;
 import com.tacz.guns.client.resource.pojo.model.BonesItem;
 import org.joml.Quaternionf;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -102,7 +102,7 @@ public class BedrockAnimatedModel extends BedrockModel implements AnimationListe
         }
     }
 
-    @Nonnull
+    @NotNull
     public CameraAnimationObject getCameraAnimationObject() {
         return cameraAnimationObject;
     }

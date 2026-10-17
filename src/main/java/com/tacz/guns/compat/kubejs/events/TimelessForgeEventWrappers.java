@@ -17,7 +17,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.LogicalSide;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface TimelessForgeEventWrappers {
     interface ForgeEventWrapper<E extends Event> {

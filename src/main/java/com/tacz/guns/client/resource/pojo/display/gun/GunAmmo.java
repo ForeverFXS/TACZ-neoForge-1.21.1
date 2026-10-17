@@ -3,7 +3,7 @@ package com.tacz.guns.client.resource.pojo.display.gun;
 import com.google.gson.annotations.SerializedName;
 import com.tacz.guns.client.resource.pojo.display.ammo.AmmoParticle;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class GunAmmo {
     @Nullable

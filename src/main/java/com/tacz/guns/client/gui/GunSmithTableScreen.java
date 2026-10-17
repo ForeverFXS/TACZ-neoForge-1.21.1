@@ -59,7 +59,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMenu> {

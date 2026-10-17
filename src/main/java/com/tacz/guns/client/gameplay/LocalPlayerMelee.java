@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.neoforged.fml.LogicalSide;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class LocalPlayerMelee {
     public static final String MELEE_STOCK_ANIMATION = "melee_stock";

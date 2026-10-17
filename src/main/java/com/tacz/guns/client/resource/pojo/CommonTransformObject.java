@@ -3,8 +3,8 @@ package com.tacz.guns.client.resource.pojo;
 import com.google.gson.*;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Type;
 
 public class CommonTransformObject {
@@ -24,7 +24,7 @@ public class CommonTransformObject {
         this.scale = scale;
     }
 
-    @Nonnull
+    @NotNull
     public Vector3f getTranslation() {
         if (translation == null) {
             translation = new Vector3f(0, 0, 0);
@@ -32,7 +32,7 @@ public class CommonTransformObject {
         return translation;
     }
 
-    @Nonnull
+    @NotNull
     public Vector3f getRotation() {
         if (rotation == null) {
             rotation = new Vector3f(0, 0, 0);
@@ -40,7 +40,7 @@ public class CommonTransformObject {
         return rotation;
     }
 
-    @Nonnull
+    @NotNull
     public Vector3f getScale() {
         if (scale == null) {
             scale = new Vector3f(1, 1, 1);

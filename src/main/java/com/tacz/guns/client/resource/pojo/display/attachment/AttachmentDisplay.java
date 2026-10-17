@@ -7,7 +7,7 @@ import com.tacz.guns.client.resource.pojo.display.LaserConfig;
 import com.tacz.guns.client.resource.pojo.display.gun.TextShow;
 import net.minecraft.resources.ResourceLocation;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public class AttachmentDisplay implements IDisplay {

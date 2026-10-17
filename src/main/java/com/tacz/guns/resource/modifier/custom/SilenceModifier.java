@@ -16,7 +16,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class SilenceModifier implements IAttachmentModifier<Pair<Modifier, Boolean>, Pair<Integer, Boolean>> {

@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URL;

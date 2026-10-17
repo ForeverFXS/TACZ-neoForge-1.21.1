@@ -3,7 +3,7 @@ package com.tacz.guns.api.modifier;
 import net.minecraft.network.chat.Component;
 import com.google.common.collect.Lists;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**

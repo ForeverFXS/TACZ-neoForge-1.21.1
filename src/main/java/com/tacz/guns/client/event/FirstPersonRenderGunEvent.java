@@ -39,7 +39,7 @@ import net.neoforged.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -214,7 +214,7 @@ public class FirstPersonRenderGunEvent {
     /**
      * 获取摄像机定位组的反相矩阵
      */
-    @Nonnull
+    @NotNull
     private static Matrix4f getPositioningNodeInverse(List<BedrockPart> nodePath) {
         Matrix4f matrix4f = new Matrix4f();
         matrix4f.identity();
@@ -304,7 +304,7 @@ public class FirstPersonRenderGunEvent {
      * @param animatedTranslation 用于输出约束点经过动画变换之后的坐标
      * @param rotation            用于输出约束点的旋转
      */
-    private static void getAnimationConstraintTransform(List<BedrockPart> nodePath, @Nonnull Vector3f originTranslation, @Nonnull Vector3f animatedTranslation, @Nonnull Vector3f rotation) {
+    private static void getAnimationConstraintTransform(List<BedrockPart> nodePath, @NotNull Vector3f originTranslation, @NotNull Vector3f animatedTranslation, @NotNull Vector3f rotation) {
         if (nodePath == null) {
             return;
         }

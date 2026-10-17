@@ -4,7 +4,7 @@ import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ReloadState;
 import net.minecraft.client.player.LocalPlayer;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;

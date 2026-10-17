@@ -21,7 +21,6 @@ import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 public class AttachmentItemRenderer extends BlockEntityWithoutLevelRenderer {
     public static final SlotModel SLOT_ATTACHMENT_MODEL = new SlotModel();
@@ -31,7 +30,7 @@ public class AttachmentItemRenderer extends BlockEntityWithoutLevelRenderer {
     }
 
     @Override
-    public void renderByItem(@Nonnull ItemStack stack, @Nonnull ItemDisplayContext transformType, @Nonnull PoseStack poseStack, @Nonnull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+    public void renderByItem(@NotNull ItemStack stack, @NotNull ItemDisplayContext transformType, @NotNull PoseStack poseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         if (stack.getItem() instanceof IAttachment iAttachment) {
             ResourceLocation attachmentId = iAttachment.getAttachmentId(stack);
             poseStack.pushPose();

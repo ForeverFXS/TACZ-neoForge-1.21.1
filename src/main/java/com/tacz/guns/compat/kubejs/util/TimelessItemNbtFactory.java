@@ -4,14 +4,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class TimelessItemNbtFactory<T extends Item, S extends TimelessItemNbtFactory<T, S>> {
     protected Item item;
     protected ResourceLocation id;
     protected int count = 1;
 
-    public TimelessItemNbtFactory(@Nonnull T item) {
+    public TimelessItemNbtFactory(@NotNull T item) {
         this.item = item;
     }
 

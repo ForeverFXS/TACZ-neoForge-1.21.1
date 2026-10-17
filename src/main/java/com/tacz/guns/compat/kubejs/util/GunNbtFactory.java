@@ -9,7 +9,7 @@ import com.tacz.guns.item.AttachmentItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.EnumMap;
 
 public class GunNbtFactory extends TimelessItemNbtFactory<AbstractGunItem, GunNbtFactory>{
@@ -20,7 +20,7 @@ public class GunNbtFactory extends TimelessItemNbtFactory<AbstractGunItem, GunNb
     private boolean bulletInBarrel = false;
     private EnumMap<AttachmentType, ResourceLocation> attachments = Maps.newEnumMap(AttachmentType.class);
 
-    public GunNbtFactory(@Nonnull AbstractGunItem item) {
+    public GunNbtFactory(@NotNull AbstractGunItem item) {
         super(item);
     }
 

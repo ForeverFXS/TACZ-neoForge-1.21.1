@@ -33,9 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
@@ -254,7 +252,6 @@ public abstract class AnimateGeoItemRenderer<M extends BedrockAnimatedModel, CTX
         }
     }
 
-    @ParametersAreNonnullByDefault
     @Override
     public void renderByItem(ItemStack stack, ItemDisplayContext ctx, PoseStack poseStack, MultiBufferSource bufferSource,
                              int light, int overlay) {
@@ -276,7 +273,7 @@ public abstract class AnimateGeoItemRenderer<M extends BedrockAnimatedModel, CTX
     /**
      * 获取摄像机定位组的反相矩阵
      */
-    @Nonnull
+    @NotNull
     public static Matrix4f getPositioningNodeInverse(List<BedrockPart> nodePath) {
         Matrix4f matrix4f = new Matrix4f();
         matrix4f.identity();

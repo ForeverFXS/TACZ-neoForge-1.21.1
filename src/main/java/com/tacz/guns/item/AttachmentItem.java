@@ -23,7 +23,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
@@ -37,9 +36,9 @@ public class AttachmentItem extends Item implements AttachmentItemDataAccessor {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     @OnlyIn(Dist.CLIENT)
-    public Component getName(@Nonnull ItemStack stack) {
+    public Component getName(@NotNull ItemStack stack) {
         ResourceLocation attachmentId = this.getAttachmentId(stack);
         Optional<ClientAttachmentIndex> attachmentIndex = TimelessAPI.getClientAttachmentIndex(attachmentId);
         if (attachmentIndex.isPresent()) {
@@ -83,7 +82,7 @@ public class AttachmentItem extends Item implements AttachmentItemDataAccessor {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public AttachmentType getType(ItemStack attachmentStack) {
         IAttachment iAttachment = IAttachment.getIAttachmentOrNull(attachmentStack);
         if (iAttachment != null) {

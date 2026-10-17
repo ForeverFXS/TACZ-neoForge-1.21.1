@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public class InventoryAttachmentSlot extends Button implements IStackTooltip {
@@ -30,7 +30,7 @@ public class InventoryAttachmentSlot extends Button implements IStackTooltip {
     }
 
     @Override
-    public void renderWidget(@Nonnull GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void renderWidget(@NotNull GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();
 

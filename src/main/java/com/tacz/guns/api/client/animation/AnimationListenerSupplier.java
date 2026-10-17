@@ -1,7 +1,7 @@
 package com.tacz.guns.api.client.animation;
 
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface AnimationListenerSupplier {
     @Nullable

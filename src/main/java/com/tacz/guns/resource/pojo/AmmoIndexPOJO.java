@@ -3,7 +3,7 @@ package com.tacz.guns.resource.pojo;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.resources.ResourceLocation;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class AmmoIndexPOJO {
     @SerializedName("name")

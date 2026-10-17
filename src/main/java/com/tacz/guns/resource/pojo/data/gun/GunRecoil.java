@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class GunRecoil {
     private static final SplineInterpolator INTERPOLATOR = new SplineInterpolator();

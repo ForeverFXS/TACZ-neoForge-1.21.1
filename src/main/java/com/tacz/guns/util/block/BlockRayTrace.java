@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.core.registries.BuiltInRegistries;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;

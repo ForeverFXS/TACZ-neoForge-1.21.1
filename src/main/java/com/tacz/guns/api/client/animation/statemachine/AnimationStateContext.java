@@ -6,7 +6,7 @@ import com.tacz.guns.api.client.animation.ObjectAnimation;
 import com.tacz.guns.api.client.animation.ObjectAnimationRunner;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class AnimationStateContext {
@@ -359,7 +359,7 @@ public class AnimationStateContext {
         }
     }
 
-    @Nonnull
+    @NotNull
     private AnimationStateMachine<?> checkStateMachine() {
         if (this.stateMachine == null) {
             throw new IllegalStateException("This context has not been bound to a state machine.");

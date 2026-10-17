@@ -15,14 +15,14 @@ import it.unimi.dsi.fastutil.doubles.Double2ObjectRBTreeMap;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class Animations {
-    public static AnimationController createControllerFromGltf(@Nonnull AnimationStructure structure, @Nonnull AnimationListenerSupplier supplier) {
+    public static AnimationController createControllerFromGltf(@NotNull AnimationStructure structure, @NotNull AnimationListenerSupplier supplier) {
         List<ObjectAnimation> prototypes = new ArrayList<>();
 
         List<AnimationModel> animationModels = structure.getAnimationModels();
@@ -115,7 +115,7 @@ public class Animations {
         return new AnimationController(createAnimationFromBedrock(animationFile), supplier);
     }
 
-    public static @Nonnull List<ObjectAnimation> createAnimationFromBedrock(BedrockAnimationFile animationFile) {
+    public static @NotNull List<ObjectAnimation> createAnimationFromBedrock(BedrockAnimationFile animationFile) {
         List<ObjectAnimation> result = new ArrayList<>();
         for (Map.Entry<String, BedrockAnimation> animationEntry : animationFile.getAnimations().entrySet()) {
             ObjectAnimation animation = new ObjectAnimation(animationEntry.getKey());

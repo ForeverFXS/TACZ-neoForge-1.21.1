@@ -6,8 +6,8 @@ import com.tacz.guns.client.model.bedrock.BedrockPart;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.world.item.ItemDisplayContext;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 
 /**
@@ -16,12 +16,12 @@ import java.util.function.Function;
 public class FunctionalBedrockPart extends BedrockPart {
     public @Nullable Function<BedrockPart, IFunctionalRenderer> functionalRenderer;
 
-    public FunctionalBedrockPart(@Nullable Function<BedrockPart, IFunctionalRenderer> functionalRenderer, @Nonnull String name) {
+    public FunctionalBedrockPart(@Nullable Function<BedrockPart, IFunctionalRenderer> functionalRenderer, @NotNull String name) {
         super(name);
         this.functionalRenderer = functionalRenderer;
     }
 
-    public FunctionalBedrockPart(@Nullable Function<BedrockPart, IFunctionalRenderer> functionalRenderer, @Nonnull BedrockPart part) {
+    public FunctionalBedrockPart(@Nullable Function<BedrockPart, IFunctionalRenderer> functionalRenderer, @NotNull BedrockPart part) {
         super(part.name);
         this.cubes.addAll(part.cubes);
         this.children.addAll(part.children);

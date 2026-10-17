@@ -3,12 +3,12 @@ package com.tacz.guns.api.client.animation.statemachine;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LuaAnimationState<T extends AnimationStateContext> implements AnimationState<T> {
-    private final @Nonnull LuaTable stateTable;
-    private final @Nonnull LuaTable scriptTable;
+    private final @NotNull LuaTable stateTable;
+    private final @NotNull LuaTable scriptTable;
     private final @Nullable LuaFunction updateFunction;
     private final @Nullable LuaFunction enterFunction;
     private final @Nullable LuaFunction exitFunction;
@@ -20,7 +20,7 @@ public class LuaAnimationState<T extends AnimationStateContext> implements Anima
      * @param stateTable 包含各个函数的表
      * @see LuaStateMachineFactory
      */
-    LuaAnimationState(@Nonnull LuaTable stateTable, @Nonnull LuaTable scriptTable) {
+    LuaAnimationState(@NotNull LuaTable stateTable, @NotNull LuaTable scriptTable) {
         this.stateTable = stateTable;
         this.scriptTable = scriptTable;
         this.updateFunction = checkLuaFunction("update");

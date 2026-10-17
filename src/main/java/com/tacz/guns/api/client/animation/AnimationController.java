@@ -2,7 +2,7 @@ package com.tacz.guns.api.client.animation;
 
 import com.google.common.collect.Maps;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

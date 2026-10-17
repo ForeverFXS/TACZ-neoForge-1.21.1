@@ -24,8 +24,8 @@ import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -182,7 +182,7 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
         }
     }
 
-    private Vector3f getBedrockPartCenter(PoseStack poseStack, @Nonnull List<BedrockPart> path) {
+    private Vector3f getBedrockPartCenter(PoseStack poseStack, @NotNull List<BedrockPart> path) {
         poseStack.pushPose();
         for (BedrockPart part : path) {
             part.translateAndRotateAndScale(poseStack);
@@ -193,7 +193,7 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
     }
 
     private void renderTempPart(PoseStack poseStack, ItemDisplayContext transformType, RenderType renderType,
-                                int light, int overlay, @Nonnull List<BedrockPart> path) {
+                                int light, int overlay, @NotNull List<BedrockPart> path) {
         poseStack.pushPose();
         for (int i = 0; i < path.size() - 1; ++i) {
             path.get(i).translateAndRotateAndScale(poseStack);

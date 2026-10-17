@@ -13,8 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 这里不包含枪械的逻辑，只包含枪械的各种 nbt 访问。<br>
@@ -298,10 +297,10 @@ public interface IGun {
     /**
      * 获取当前枪械指定类型的配件
      */
-    @Nonnull
+    @NotNull
     ItemStack getAttachment(ItemStack gun, AttachmentType type);
 
-    @Nonnull
+    @NotNull
     ItemStack getBuiltinAttachment(ItemStack gun, AttachmentType type);
 
     /**
@@ -312,7 +311,7 @@ public interface IGun {
     @Nullable
     CompoundTag getAttachmentTag(ItemStack gun, AttachmentType type);
 
-    @Nonnull
+    @NotNull
     ResourceLocation getBuiltInAttachmentId(ItemStack gun, AttachmentType type);
 
     /**
@@ -320,18 +319,18 @@ public interface IGun {
      * <p>
      * 如果不存在，返回 {@link DefaultAssets#EMPTY_ATTACHMENT_ID};
      */
-    @Nonnull
+    @NotNull
     ResourceLocation getAttachmentId(ItemStack gun, AttachmentType type);
 
     /**
      * 安装配件
      */
-    void installAttachment(@Nonnull ItemStack gun, @Nonnull ItemStack attachment);
+    void installAttachment(@NotNull ItemStack gun, @NotNull ItemStack attachment);
 
     /**
      * 卸载配件
      */
-    void unloadAttachment(@Nonnull ItemStack gun, AttachmentType type);
+    void unloadAttachment(@NotNull ItemStack gun, AttachmentType type);
 
     /**
      * 该枪械是否允许装配该配件

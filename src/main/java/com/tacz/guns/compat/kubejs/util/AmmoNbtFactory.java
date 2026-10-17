@@ -4,10 +4,10 @@ import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.item.AmmoItem;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public class AmmoNbtFactory extends TimelessItemNbtFactory<AmmoItem, AmmoNbtFactory> {
-    public AmmoNbtFactory(@Nonnull AmmoItem item) {
+    public AmmoNbtFactory(@NotNull AmmoItem item) {
         super(item);
     }
 

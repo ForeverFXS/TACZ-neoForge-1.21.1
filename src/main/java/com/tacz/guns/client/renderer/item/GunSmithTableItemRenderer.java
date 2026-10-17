@@ -18,7 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public class GunSmithTableItemRenderer extends BlockEntityWithoutLevelRenderer {
     private static final SlotModel SLOT_BLOCK_MODEL = new SlotModel();
@@ -27,7 +27,7 @@ public class GunSmithTableItemRenderer extends BlockEntityWithoutLevelRenderer {
     }
 
     @Override
-    public void renderByItem(@Nonnull ItemStack stack, @Nonnull ItemDisplayContext transformType, @Nonnull PoseStack poseStack, @Nonnull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+    public void renderByItem(@NotNull ItemStack stack, @NotNull ItemDisplayContext transformType, @NotNull PoseStack poseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         GunSmithTableRenderer.getIndex(stack).ifPresentOrElse(index -> {
             BedrockModel model = index.getModel();
             ResourceLocation texture = index.getTexture();

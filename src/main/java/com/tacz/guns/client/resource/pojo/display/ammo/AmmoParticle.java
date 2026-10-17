@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import net.minecraft.core.particles.ParticleOptions;
 import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class AmmoParticle {
     private static final Vector3f ZERO = new Vector3f(0, 0, 0);

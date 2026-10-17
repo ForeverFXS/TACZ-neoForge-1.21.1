@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.fml.ModLoadingContext;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class MenuIntegration {
     public static ConfigBuilder getConfigBuilder() {

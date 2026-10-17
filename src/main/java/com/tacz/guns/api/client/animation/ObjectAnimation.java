@@ -1,7 +1,7 @@
 package com.tacz.guns.api.client.animation;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 /**
@@ -20,13 +20,13 @@ public class ObjectAnimation {
     /**
      * 播放类型
      */
-    public @Nonnull PlayType playType = PlayType.PLAY_ONCE_HOLD;
+    public @NotNull PlayType playType = PlayType.PLAY_ONCE_HOLD;
     /**
      * 所有轨道的最大结束时间 {@link ObjectAnimationChannel#getEndTimeS()}
      */
     private float maxEndTimeS = 0f;
 
-    protected ObjectAnimation(@Nonnull String name) {
+    protected ObjectAnimation(@NotNull String name) {
         this.name = Objects.requireNonNull(name);
     }
 
@@ -67,7 +67,7 @@ public class ObjectAnimation {
         }
     }
 
-    protected void setSoundChannel(@Nonnull ObjectAnimationSoundChannel soundChannel) {
+    protected void setSoundChannel(@NotNull ObjectAnimationSoundChannel soundChannel) {
         if (soundChannel.getEndTimeS() > maxEndTimeS) {
             maxEndTimeS = (float) soundChannel.getEndTimeS();
         }

@@ -5,11 +5,11 @@ import com.tacz.guns.item.AttachmentItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public class AttachmentNbtFactory extends TimelessItemNbtFactory<AttachmentItem, AttachmentNbtFactory>{
 
-    public AttachmentNbtFactory(@Nonnull AttachmentItem item) {
+    public AttachmentNbtFactory(@NotNull AttachmentItem item) {
         super(item);
     }
 

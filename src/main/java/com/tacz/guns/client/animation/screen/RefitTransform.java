@@ -10,7 +10,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = GunMod.MOD_ID)
@@ -35,12 +35,12 @@ public class RefitTransform {
         return refitScreenOpeningProgress;
     }
 
-    @Nonnull
+    @NotNull
     public static AttachmentType getOldTransformType() {
         return Objects.requireNonNullElse(oldTransformType, AttachmentType.NONE);
     }
 
-    @Nonnull
+    @NotNull
     public static AttachmentType getCurrentTransformType() {
         return Objects.requireNonNullElse(currentTransformType, AttachmentType.NONE);
     }

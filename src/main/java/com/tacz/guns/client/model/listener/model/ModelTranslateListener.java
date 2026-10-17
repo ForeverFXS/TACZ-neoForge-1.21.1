@@ -6,7 +6,7 @@ import com.tacz.guns.client.model.BedrockAnimatedModel;
 import com.tacz.guns.client.model.bedrock.ModelRendererWrapper;
 import com.tacz.guns.client.resource.pojo.model.BonesItem;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ModelTranslateListener implements AnimationListener {
     private final ModelRendererWrapper rendererWrapper;

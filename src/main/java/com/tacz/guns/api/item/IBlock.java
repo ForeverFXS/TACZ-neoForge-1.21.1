@@ -3,7 +3,7 @@ package com.tacz.guns.api.item;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface IBlock {
     /**

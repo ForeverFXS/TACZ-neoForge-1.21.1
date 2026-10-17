@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import com.tacz.guns.api.item.attachment.AttachmentType;
 import net.minecraft.resources.ResourceLocation;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class AttachmentIndexPOJO {
     @SerializedName("name")

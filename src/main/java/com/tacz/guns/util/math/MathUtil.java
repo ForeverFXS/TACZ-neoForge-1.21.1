@@ -7,7 +7,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public class MathUtil {
     public static final float[] QUATERNION_ONE = {0, 0, 0, 1};
@@ -64,7 +64,7 @@ public class MathUtil {
      * @param roll 绕 z 轴旋转的弧度
      * @param quaternion 求解的结果将写入这个四元数中。
      */
-    public static void toQuaternion(float pitch, float yaw, float roll, @Nonnull Quaternionf quaternion) {
+    public static void toQuaternion(float pitch, float yaw, float roll, @NotNull Quaternionf quaternion) {
         double cy = Math.cos(roll * 0.5);
         double sy = Math.sin(roll * 0.5);
         double cp = Math.cos(yaw * 0.5);

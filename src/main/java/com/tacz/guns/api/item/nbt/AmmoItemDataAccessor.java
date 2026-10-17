@@ -9,15 +9,15 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public interface AmmoItemDataAccessor extends IAmmo {
     String AMMO_ID_TAG = "AmmoId";
 
     @Override
-    @Nonnull
+    @NotNull
     default ResourceLocation getAmmoId(ItemStack ammo) {
         CompoundTag nbt = ammo.getOrCreateTag();
         if (nbt.contains(AMMO_ID_TAG, Tag.TAG_STRING)) {

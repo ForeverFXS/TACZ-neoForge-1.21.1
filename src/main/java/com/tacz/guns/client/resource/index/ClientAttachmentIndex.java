@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -77,7 +77,7 @@ public class ClientAttachmentIndex {
         index.tooltipKey = attachmentIndexPOJO.getTooltip();
     }
 
-    @Nonnull
+    @NotNull
     private static AttachmentDisplay checkDisplay(AttachmentIndexPOJO indexPOJO, ClientAttachmentIndex index) {
         ResourceLocation pojoDisplay = indexPOJO.getDisplay();
         Preconditions.checkArgument(pojoDisplay != null, "index object missing display field");

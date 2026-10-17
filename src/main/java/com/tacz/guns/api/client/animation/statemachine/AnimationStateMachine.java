@@ -2,8 +2,8 @@ package com.tacz.guns.api.client.animation.statemachine;
 
 import com.tacz.guns.api.client.animation.AnimationController;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -31,14 +31,14 @@ public class AnimationStateMachine<T extends AnimationStateContext> {
     /**
      * 状态机控制的动画控制器
      */
-    private final @Nonnull AnimationController animationController;
+    private final @NotNull AnimationController animationController;
 
     protected long exitingTime = -1;
 
     /**
      * @param animationController 动画状态机控制的动画控制器
      */
-    public AnimationStateMachine(@Nonnull AnimationController animationController) {
+    public AnimationStateMachine(@NotNull AnimationController animationController) {
         this.animationController = Objects.requireNonNull(animationController);
     }
 
@@ -147,7 +147,7 @@ public class AnimationStateMachine<T extends AnimationStateContext> {
     /**
      * @return 状态机控制的动画控制器
      */
-    public @Nonnull AnimationController getAnimationController() {
+    public @NotNull AnimationController getAnimationController() {
         return animationController;
     }
 
@@ -173,7 +173,7 @@ public class AnimationStateMachine<T extends AnimationStateContext> {
      * 在状态机 initialize 执行之后，无法执行本方法，必须先调用 exit 方法退出状态机.
      * 这么做是因为需要确保状态机在一个运行周期内使用的 context 是唯一的。
      */
-    public void setContext(@Nonnull T context) {
+    public void setContext(@NotNull T context) {
         AnimationStateMachine<?> stateMachine = context.getStateMachine();
         if (stateMachine != null && stateMachine != this) {
             throw new IllegalStateException("Context is already used");

@@ -23,7 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class GunSmithTableMenu extends AbstractContainerMenu {

@@ -2,7 +2,7 @@ package com.tacz.guns.client.resource.pojo.animation.bedrock;
 
 import com.google.gson.annotations.SerializedName;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public class BedrockAnimation {
