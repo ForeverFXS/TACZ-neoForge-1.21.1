@@ -17,7 +17,7 @@ import com.tacz.guns.client.resource.pojo.display.gun.ControllableData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.settings.KeyConflictContext;
+import net.neoforged.neoforge.client.settings.KeyConflictContext;
 
 import java.util.EnumMap;
 
