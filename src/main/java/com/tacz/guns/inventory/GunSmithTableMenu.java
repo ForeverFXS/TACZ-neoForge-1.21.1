@@ -20,7 +20,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
 import org.jetbrains.annotations.Nullable;
@@ -85,7 +86,8 @@ public class GunSmithTableMenu extends AbstractContainerMenu {
         if (recipe == null) {
             return;
         }
-        player.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(handler -> {
+        IItemHandler handler = player.getCapability(Capabilities.ItemHandler.ENTITY);
+        if (handler != null) {
             // 是创造模式，就不扣材料
             if (!player.isCreative()) {
                 Int2IntArrayMap recordCount = new Int2IntArrayMap();
@@ -132,6 +134,6 @@ public class GunSmithTableMenu extends AbstractContainerMenu {
             // 更新，否则客户端显示不正确
             player.inventoryMenu.broadcastFullState();
             NetworkHandler.sendToClientPlayer(new ServerMessageCraft(this.containerId), player);
-        });
+        }
     }
 }

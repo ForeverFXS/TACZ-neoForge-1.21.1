@@ -53,6 +53,7 @@ public class GunMod {
         ModParticles.PARTICLE_TYPES.register(bus);
         ModAttributes.ATTRIBUTES.register(bus);
         ModPainting.PAINTINGS.register(bus);
+        CapabilityRegistry.register(bus);
         if (ModList.get().isLoaded("kubejs")) {
             bus.register(new TimelessKubeJSPlugin());
         }
