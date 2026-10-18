@@ -1,14 +1,11 @@
 package com.tacz.guns.event;
 
-import com.tacz.guns.GunMod;
 import com.tacz.guns.entity.sync.core.*;
 import com.tacz.guns.network.NetworkHandler;
 import com.tacz.guns.network.message.ServerMessageUpdateEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.event.AttachCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -28,18 +25,6 @@ import java.util.stream.Collectors;
 
 @EventBusSubscriber
 public final class SyncedEntityDataEvent {
-    @SubscribeEvent
-    public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
-        if (SyncedEntityData.instance().hasSyncedDataKey(event.getObject())) {
-            DataHolderCapabilityProvider provider = new DataHolderCapabilityProvider();
-            event.addCapability(ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "synced_entity_data"), provider);
-            // Don't add invalidate to server player since it's persistent
-            if (!(event.getObject() instanceof ServerPlayer)) {
-                event.addListener(provider::invalidate);
-            }
-        }
-    }
-
     @SubscribeEvent
     public static void onStartTracking(PlayerEvent.StartTracking event) {
         if (!event.getEntity().level().isClientSide()) {
@@ -72,12 +57,10 @@ public final class SyncedEntityDataEvent {
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
         Player original = event.getOriginal();
-        original.reviveCaps();
         DataHolder oldHolder = SyncedEntityData.instance().getDataHolder(original);
         if (oldHolder == null) {
             return;
         }
-        original.invalidateCaps();
         Player player = event.getEntity();
         DataHolder newHolder = SyncedEntityData.instance().getDataHolder(player);
         if (newHolder == null) {
@@ -113,7 +96,7 @@ public final class SyncedEntityDataEvent {
             }
             List<DataEntry<?, ?>> selfEntries = entries.stream().filter(entry -> entry.getKey().syncMode().isSelf()).collect(Collectors.toList());
             if (!selfEntries.isEmpty() && entity instanceof ServerPlayer) {
-                NetworkHandler.sendToClientPlayer(new ServerMessageUpdateEntityData(entity.getId(), selfEntries), entity);
+                NetworkHandler.sendToClientPlayer(new ServerMessageUpdateEntityData(entity.getId(), selfEntries), (ServerPlayer) entity);
             }
             List<DataEntry<?, ?>> trackingEntries = entries.stream().filter(entry -> entry.getKey().syncMode().isTracking()).collect(Collectors.toList());
             if (!trackingEntries.isEmpty()) {
