@@ -50,7 +50,9 @@ public class LivingEntityMelee {
         }
         ItemStack currentGunItem = data.currentGunItem.get();
         // 触发近战事件
-        if (NeoForge.EVENT_BUS.post(new GunMeleeEvent(shooter, currentGunItem, LogicalSide.SERVER))) {
+        GunMeleeEvent gunMeleeEvent = new GunMeleeEvent(shooter, currentGunItem, LogicalSide.SERVER);
+        NeoForge.EVENT_BUS.post(gunMeleeEvent);
+        if (gunMeleeEvent.isCanceled()) {
             return;
         }
         NetworkHandler.sendToTrackingEntity(new ServerMessageGunMelee(shooter.getId(), currentGunItem), shooter);

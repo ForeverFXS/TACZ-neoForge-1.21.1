@@ -62,7 +62,9 @@ public class LivingEntityReload {
                 return;
             }
             // 触发装弹事件
-            if (NeoForge.EVENT_BUS.post(new GunReloadEvent(shooter, currentGunItem, LogicalSide.SERVER))) {
+            GunReloadEvent gunReloadEvent = new GunReloadEvent(shooter, currentGunItem, LogicalSide.SERVER);
+            NeoForge.EVENT_BUS.post(gunReloadEvent);
+            if (gunReloadEvent.isCanceled()) {
                 return;
             }
             NetworkHandler.sendToTrackingEntity(new ServerMessageGunReload(shooter.getId(), currentGunItem), shooter);

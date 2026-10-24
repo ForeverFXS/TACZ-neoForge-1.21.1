@@ -43,6 +43,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
+import net.minecraft.core.RegistryAccess;
 
 /**
  * 经过处理和校验的枪械显示数据
@@ -603,7 +604,7 @@ public class GunDisplayInstance {
             try {
                 String name = particle.getName();
                 if (StringUtils.isNoneBlank()) {
-                    particle.setParticleOptions(ParticleArgument.readParticle(new StringReader(name), BuiltInRegistries.PARTICLE_TYPE.asLookup()));
+                    particle.setParticleOptions(ParticleArgument.readParticle(new StringReader(name), RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY)));
                     Preconditions.checkArgument(particle.getCount() > 0, "particle count must be greater than 0");
                     Preconditions.checkArgument(particle.getLifeTime() > 0, "particle life time must be greater than 0");
                     this.particle = particle;

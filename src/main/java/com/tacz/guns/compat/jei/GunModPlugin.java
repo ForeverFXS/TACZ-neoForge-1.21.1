@@ -22,6 +22,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 
 import java.util.HashMap;
@@ -53,7 +54,9 @@ public class GunModPlugin implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registration) {
         if(Minecraft.getInstance().level==null) return;
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-        List<GunSmithTableRecipe> recipes = recipeManager.getAllRecipesFor(ModRecipe.GUN_SMITH_TABLE_CRAFTING.get());
+        // 1.21: RecipeManager#getAllRecipesFor 返回 List<RecipeHolder<T>>，需解包出 Recipe 本体
+        List<GunSmithTableRecipe> recipes = recipeManager.getAllRecipesFor(ModRecipe.GUN_SMITH_TABLE_CRAFTING.get())
+                .stream().map(RecipeHolder::value).toList();
 
         for (var entry : recipeTypeMap.entrySet()) {
             TimelessAPI.getCommonBlockIndex(entry.getKey()).ifPresent(blockIndex -> {

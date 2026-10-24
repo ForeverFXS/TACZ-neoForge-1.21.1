@@ -30,7 +30,9 @@ public class AdjustmentYRotModifier implements Function<String, Optional<Adjustm
             return Optional.empty();
         }
 
-        float partialTick = mc.getPartialTick();
+        // 1.21.1 移除了 Minecraft#getPartialTick()，partial tick 改由 DeltaTracker 提供。
+        // 传 true 跳过冻结检查，与 1.20.1 的 partialTick 语义一致（暂停时不冻结骨骼插值）。
+        float partialTick = mc.getTimer().getGameTimeDeltaPartialTick(true);
         float yBodyRot = Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot);
         float yHeadRot = Mth.rotLerp(partialTick, player.yHeadRotO, player.yHeadRot);
         float xRot = Mth.lerp(partialTick, player.xRotO, player.getXRot());

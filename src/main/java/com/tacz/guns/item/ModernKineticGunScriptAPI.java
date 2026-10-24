@@ -45,6 +45,7 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import com.tacz.guns.api.item.nbt.ItemNbtHelper;
 
 @SuppressWarnings("unused")
 public class ModernKineticGunScriptAPI {
@@ -159,7 +160,9 @@ public class ModernKineticGunScriptAPI {
                 return false;
             }
             // 触发击发事件
-            boolean fire = !NeoForge.EVENT_BUS.post(new GunFireEvent(shooter, itemStack, LogicalSide.SERVER));
+            GunFireEvent gunFireEvent = new GunFireEvent(shooter, itemStack, LogicalSide.SERVER);
+            NeoForge.EVENT_BUS.post(gunFireEvent);
+            boolean fire = !gunFireEvent.isCanceled();
             if (fire) {
                 NetworkHandler.sendToTrackingEntity(new ServerMessageGunFire(shooter.getId(), itemStack), shooter);
                 // 削减弹药
@@ -883,8 +886,8 @@ public class ModernKineticGunScriptAPI {
         Optional<CommonGunIndex> gunIndexOptional = TimelessAPI.getCommonGunIndex(gunId);
         gunIndex = gunIndexOptional.orElse(null);
         abstractGunItem = gunItem;
-        if (itemStack.hasTag()) {
-            nbtUtil = new LuaNbtAccessor(itemStack.getTag());
+        if (ItemNbtHelper.hasTag(itemStack)) {
+            nbtUtil = new LuaNbtAccessor(ItemNbtHelper.getTag(itemStack));
         }
     }
 

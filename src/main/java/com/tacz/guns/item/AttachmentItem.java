@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.tacz.guns.util.datafixer.AttachmentIdFix.updateAttachmentIdInTag;
+import com.tacz.guns.api.item.nbt.ItemNbtHelper;
 
 public class AttachmentItem extends Item implements AttachmentItemDataAccessor {
     public AttachmentItem() {
@@ -99,7 +100,10 @@ public class AttachmentItem extends Item implements AttachmentItemDataAccessor {
     }
 
     @Override
-    public void verifyTagAfterLoad(@NotNull CompoundTag tag) {
-        updateAttachmentIdInTag(tag);
+    public void verifyComponentsAfterLoad(ItemStack stack) {
+        CompoundTag tag = ItemNbtHelper.getTag(stack);
+        if (tag != null) {
+            updateAttachmentIdInTag(tag);
+        }
     }
 }

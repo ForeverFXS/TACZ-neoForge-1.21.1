@@ -1,7 +1,6 @@
 package com.tacz.guns.client.renderer.entity;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.tacz.guns.client.model.bedrock.BedrockModel;
@@ -15,7 +14,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MinecartRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -63,13 +61,10 @@ public class TargetMinecartRenderer extends MinecartRenderer<TargetMinecart> {
                 stack.translate(0, 1, -4.5 / 16d);
                 Minecraft minecraft = Minecraft.getInstance();
                 GameProfile gameProfile = targetMinecart.getGameProfile();
-                var map = minecraft.getSkinManager().getInsecureSkinInformation(gameProfile);
-                ResourceLocation skin;
-                if (map.containsKey(MinecraftProfileTexture.Type.SKIN)) {
-                    skin = minecraft.getSkinManager().registerTexture(map.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
-                } else {
-                    skin = DefaultPlayerSkin.getDefaultSkin(UUIDUtil.getOrCreatePlayerUUID(gameProfile));
+                if (gameProfile.getId() == null) {
+                    gameProfile = new GameProfile(UUIDUtil.createOfflinePlayerUUID(gameProfile.getName()), gameProfile.getName());
                 }
+                ResourceLocation skin = minecraft.getSkinManager().getInsecureSkin(gameProfile).texture();
                 headModel.visible = true;
                 RenderType skullRenderType = RenderType.entityTranslucentCull(skin);
                 headModel.render(stack, ItemDisplayContext.NONE, buffer.getBuffer(skullRenderType), pPackedLight, OverlayTexture.NO_OVERLAY);

@@ -1,11 +1,13 @@
 package com.tacz.guns.block;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.MapCodec;
 import com.tacz.guns.block.entity.TargetBlockEntity;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -47,8 +49,17 @@ public class TargetBlock extends BaseEntityBlock {
     public static final VoxelShape BOX_UPPER_Z = Block.box(2, 0, 6, 14, 16, 10);
 
     public TargetBlock() {
-        super(Properties.of().sound(SoundType.WOOD).strength(2.0F, 3.0F).noOcclusion());
+        this(Properties.of().sound(SoundType.WOOD).strength(2.0F, 3.0F).noOcclusion());
+    }
+
+    public TargetBlock(Properties properties) {
+        super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(HALF, DoubleBlockHalf.LOWER).setValue(STAND, true).setValue(OUTPUT_POWER, 0));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(TargetBlock::new);
     }
 
     public static int getRedstoneStrength(BlockHitResult hit, boolean isUpperBlock) {
@@ -181,7 +192,7 @@ public class TargetBlock extends BaseEntityBlock {
             world.setBlock(above, state.setValue(HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
             world.blockUpdated(pos, Blocks.AIR);
             state.updateNeighbourShapes(world, pos, Block.UPDATE_ALL);
-            if (stack.hasCustomHoverName()) {
+            if (stack.has(DataComponents.CUSTOM_NAME)) {
                 BlockEntity blockentity = world.getBlockEntity(pos);
                 if (blockentity instanceof TargetBlockEntity e) {
                     GameProfile gameprofile = new GameProfile(null, stack.getHoverName().getString());
@@ -194,11 +205,13 @@ public class TargetBlock extends BaseEntityBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         BlockPos blockPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos : pos.below();
         BlockEntity blockentity = level.getBlockEntity(blockPos);
         if (blockentity instanceof TargetBlockEntity e) {
-            return new ItemStack(this).setHoverName(e.getCustomName());
+            ItemStack stack = new ItemStack(this);
+            stack.set(DataComponents.CUSTOM_NAME, e.getCustomName());
+            return stack;
         }
         return super.getCloneItemStack(state, target, level, pos, player);
     }

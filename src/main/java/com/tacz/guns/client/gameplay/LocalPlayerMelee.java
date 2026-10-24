@@ -80,7 +80,8 @@ public class LocalPlayerMelee {
         data.lockState(operator -> operator.getSynMeleeCoolDown() > 0);
         // 触发近战事件
         GunMeleeEvent gunMeleeEvent = new GunMeleeEvent(player, player.getMainHandItem(), LogicalSide.CLIENT);
-        return !NeoForge.EVENT_BUS.post(gunMeleeEvent);
+        NeoForge.EVENT_BUS.post(gunMeleeEvent);
+        return !gunMeleeEvent.isCanceled();
     }
 
     private void doMuzzleMelee(GunDisplayInstance display) {

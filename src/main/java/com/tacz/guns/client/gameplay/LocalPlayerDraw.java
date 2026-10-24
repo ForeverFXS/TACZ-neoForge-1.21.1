@@ -42,9 +42,6 @@ public class LocalPlayerDraw {
         long putAwayTime = Math.abs(drawTime);
 
         // 发包通知服务器
-        if (Minecraft.getInstance().gameMode != null) {
-            Minecraft.getInstance().gameMode.ensureHasSentCarriedItem();
-        }
         NetworkHandler.sendToServer(new ClientMessagePlayerDrawGun());
         NeoForge.EVENT_BUS.post(new GunDrawEvent(player, lastItem, currentItem, LogicalSide.CLIENT));
 

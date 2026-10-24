@@ -25,7 +25,7 @@ public final class PapiManager {
     }
 
     public static String getTextShow(String textKey, ItemStack stack) {
-        String text = I18n.language.getOrDefault(textKey);
+        String text = I18n.get(textKey);
         for (var entry : PAPI.entrySet()) {
             String placeholder = entry.getKey();
             String data = entry.getValue().apply(stack);

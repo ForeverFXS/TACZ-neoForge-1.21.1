@@ -33,6 +33,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
@@ -255,7 +256,9 @@ public class CommonAssetsManager implements ICommonResourceProvider {
     public static void onReload(TagsUpdatedEvent event) {
         if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD){
             if (getInstance() !=null && getInstance().recipeManager != null) {
-                List<GunSmithTableRecipe> recipes = getInstance().recipeManager.getAllRecipesFor(ModRecipe.GUN_SMITH_TABLE_CRAFTING.get());
+                // 1.21: RecipeManager#getAllRecipesFor 返回 List<RecipeHolder<T>>，需解包出 Recipe 本体
+                List<GunSmithTableRecipe> recipes = getInstance().recipeManager.getAllRecipesFor(ModRecipe.GUN_SMITH_TABLE_CRAFTING.get())
+                        .stream().map(RecipeHolder::value).toList();
                 for (GunSmithTableRecipe recipe : recipes) {
                     recipe.init();
                 }

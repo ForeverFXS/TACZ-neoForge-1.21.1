@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import net.minecraft.core.RegistryAccess;
 
 public class ClientAmmoIndex {
     private final Object modelLoadLock = new Object();
@@ -228,7 +229,7 @@ public class ClientAmmoIndex {
                 AmmoParticle particle = display.getParticle();
                 String name = particle.getName();
                 if (StringUtils.isNoneBlank()) {
-                    particle.setParticleOptions(ParticleArgument.readParticle(new StringReader(name), BuiltInRegistries.PARTICLE_TYPE.asLookup()));
+                    particle.setParticleOptions(ParticleArgument.readParticle(new StringReader(name), RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY)));
                     Preconditions.checkArgument(particle.getCount() > 0, "particle count must be greater than 0");
                     Preconditions.checkArgument(particle.getLifeTime() > 0, "particle life time must be greater than 0");
                     index.particle = particle;

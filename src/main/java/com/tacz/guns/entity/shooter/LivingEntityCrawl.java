@@ -43,7 +43,7 @@ public class LivingEntityCrawl {
             return;
         }
         // 如果是观察者模型、骑乘、跳跃、在游泳、不在地上，取消
-        if (shooter.isSpectator() || shooter.isPassenger() || shooter.jumping || shooter.isSwimming() || !shooter.onGround()) {
+        if (shooter.isSpectator() || shooter.isPassenger() || shooter.getDeltaMovement().y > 0.0 || shooter.isSwimming() || !shooter.onGround()) {
             data.isCrawling = false;
             this.setCrawlPose();
             return;

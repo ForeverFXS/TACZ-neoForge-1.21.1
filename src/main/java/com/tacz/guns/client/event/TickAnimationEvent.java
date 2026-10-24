@@ -49,9 +49,6 @@ public class TickAnimationEvent {
 
     @SubscribeEvent
     public static void tickAnimation(RenderFrameEvent.Pre event) {
-        {
-            return;
-        }
         if (Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
             return;
         }

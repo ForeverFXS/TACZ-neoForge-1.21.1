@@ -77,7 +77,7 @@ public class LivingEntityShoot {
         if (SyncConfig.SERVER_SHOOT_NETWORK_V.get()) {
             // 根据 tick time 和 允许的网络延迟波动 计算 时间戳的接受窗口
             MinecraftServer server = Objects.requireNonNull(shooter.getServer());
-            double tickTime = Math.max(server.tickTimes[server.getTickCount() % 100] * 1.0E-6D, 50);
+            double tickTime = Math.max(server.getTickTimesNanos()[server.getTickCount() % 100] * 1.0E-6D, 50);
             long alpha = System.currentTimeMillis() - data.baseTimestamp - timestamp;
             if (alpha < -300 || alpha > 300 + tickTime * 2) { // 允许 +- 300ms 的网络波动、窗口下限再扩大 2 个 tick time 时间(最坏情况射击会延迟2个 tick)
                 if (shooter instanceof ServerPlayer player) {
@@ -143,7 +143,9 @@ public class LivingEntityShoot {
             iGun.setBulletInBarrel(currentGunItem, true);
         }
         // 触发射击事件
-        if (NeoForge.EVENT_BUS.post(new GunShootEvent(shooter, currentGunItem, LogicalSide.SERVER))) {
+        GunShootEvent gunShootEvent = new GunShootEvent(shooter, currentGunItem, LogicalSide.SERVER);
+        NeoForge.EVENT_BUS.post(gunShootEvent);
+        if (gunShootEvent.isCanceled()) {
             return ShootResult.FORGE_EVENT_CANCEL;
         }
 

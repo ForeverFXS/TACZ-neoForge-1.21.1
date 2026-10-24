@@ -28,7 +28,9 @@ public class LivingEntityFireSelect {
         if (!(currentGunItem.getItem() instanceof IGun iGun)) {
             return;
         }
-        if (NeoForge.EVENT_BUS.post(new GunFireSelectEvent(shooter, currentGunItem, LogicalSide.SERVER))) {
+        GunFireSelectEvent gunFireSelectEvent = new GunFireSelectEvent(shooter, currentGunItem, LogicalSide.SERVER);
+        NeoForge.EVENT_BUS.post(gunFireSelectEvent);
+        if (gunFireSelectEvent.isCanceled()) {
             return;
         }
         NetworkHandler.sendToTrackingEntity(new ServerMessageGunFireSelect(shooter.getId(), currentGunItem), shooter);

@@ -25,8 +25,6 @@ public abstract class GameRendererMixin {
     @Shadow
     public abstract Minecraft getMinecraft();
 
-    @Shadow
-    public abstract void render(float pPartialTicks, long pNanoTime, boolean pRenderLevel);
 
     @Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true)
     public void onBobHurt(PoseStack pMatrixStack, float pPartialTicks, CallbackInfo ci) {
@@ -40,9 +38,13 @@ public abstract class GameRendererMixin {
         // 触发其他事件
         boolean cancel;
         if (!tacz$useFovSetting) {
-            cancel = NeoForge.EVENT_BUS.post(new RenderItemInHandBobEvent.BobHurt());
+            RenderItemInHandBobEvent.BobHurt bobHurtEvent = new RenderItemInHandBobEvent.BobHurt();
+            NeoForge.EVENT_BUS.post(bobHurtEvent);
+            cancel = bobHurtEvent.isCanceled();
         } else {
-            cancel = NeoForge.EVENT_BUS.post(new RenderLevelBobEvent.BobHurt());
+            RenderLevelBobEvent.BobHurt bobHurtEvent = new RenderLevelBobEvent.BobHurt();
+            NeoForge.EVENT_BUS.post(bobHurtEvent);
+            cancel = bobHurtEvent.isCanceled();
         }
         if (cancel) {
             ci.cancel();
@@ -53,9 +55,13 @@ public abstract class GameRendererMixin {
     public void onBobView(PoseStack pMatrixStack, float pPartialTicks, CallbackInfo ci) {
         boolean cancel;
         if (!tacz$useFovSetting) {
-            cancel = NeoForge.EVENT_BUS.post(new RenderItemInHandBobEvent.BobView());
+            RenderItemInHandBobEvent.BobView bobViewEvent = new RenderItemInHandBobEvent.BobView();
+            NeoForge.EVENT_BUS.post(bobViewEvent);
+            cancel = bobViewEvent.isCanceled();
         } else {
-            cancel = NeoForge.EVENT_BUS.post(new RenderLevelBobEvent.BobView());
+            RenderLevelBobEvent.BobView bobViewEvent = new RenderLevelBobEvent.BobView();
+            NeoForge.EVENT_BUS.post(bobViewEvent);
+            cancel = bobViewEvent.isCanceled();
         }
         if (cancel) {
             ci.cancel();

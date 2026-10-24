@@ -21,8 +21,6 @@ public class ItemInHandRendererMixin implements KeepingItemRenderer {
     @Shadow
     private float mainHandHeight;
     @Shadow
-    private float oMainHandHeight;
-    @Shadow
     private ItemStack mainHandItem;
     @Unique
     private ItemStack tacz$KeepItem;

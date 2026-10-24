@@ -23,6 +23,7 @@ import net.neoforged.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
 import static com.tacz.guns.util.InputExtraCheck.isInGame;
+import net.minecraft.world.InteractionHand;
 
 @OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(value = Dist.CLIENT)
@@ -100,14 +101,14 @@ public class InteractKey {
         BlockPos blockPos = blockHitResult.getBlockPos();
         BlockState block = player.level().getBlockState(blockPos);
         if (InteractKeyConfigRead.canInteractBlock(block)) {
-            mc.startUseItem();
+            mc.gameMode.useItem(player, InteractionHand.MAIN_HAND);
         }
     }
 
     private static void interactEntity(EntityHitResult entityHitResult, Minecraft mc) {
         Entity entity = entityHitResult.getEntity();
-        if (InteractKeyConfigRead.canInteractEntity(entity)) {
-            mc.startUseItem();
+        if (InteractKeyConfigRead.canInteractEntity(entity) && mc.player != null) {
+            mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
         }
     }
 }

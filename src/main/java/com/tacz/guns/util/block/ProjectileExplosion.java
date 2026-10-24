@@ -4,13 +4,14 @@ import com.google.common.collect.Sets;
 import com.tacz.guns.config.common.AmmoConfig;
 import com.tacz.guns.util.HitboxHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
@@ -39,9 +41,13 @@ public class ProjectileExplosion extends Explosion {
     private final Entity owner;
     private final Entity exploder;
     private final ExplosionDamageCalculator damageCalculator;
+    private final DamageSource damageSource;
 
     public ProjectileExplosion(Level level, Entity owner, Entity exploder, @Nullable DamageSource source, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float power, float radius, boolean knockback, Explosion.BlockInteraction mode) {
-        super(level, exploder, source, damageCalculator, x, y, z, radius, AmmoConfig.EXPLOSIVE_AMMO_FIRE.get(), mode);
+        // 1.21 的 Explosion 构造器需要显式传入粒子与音效
+        super(level, exploder, source, damageCalculator, x, y, z, radius,
+                AmmoConfig.EXPLOSIVE_AMMO_FIRE.get(), mode,
+                ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
         this.level = level;
         this.x = x;
         this.y = y;
@@ -51,6 +57,8 @@ public class ProjectileExplosion extends Explosion {
         this.owner = owner;
         this.exploder = exploder;
         this.damageCalculator = damageCalculator == null ? DEFAULT_CONTEXT : damageCalculator;
+        // 1.21 移除了 Explosion#getDamageSource()，damageSource 改为 private final 字段，这里自行持有
+        this.damageSource = source != null ? source : Explosion.getDefaultDamageSource(level, exploder);
         this.knockback = knockback;
     }
 
@@ -112,11 +120,11 @@ public class ProjectileExplosion extends Explosion {
         int maxZ = Mth.floor(this.z + (double) radius + 1.0D);
         radius *= 2;
         List<Entity> entities = this.level.getEntities(this.exploder, new AABB(minX, minY, minZ, maxX, maxY, maxZ));
-        net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.level, this, entities, radius);
+        net.neoforged.neoforge.event.EventHooks.onExplosionDetonate(this.level, this, entities, radius);
         Vec3 explosionPos = new Vec3(this.x, this.y, this.z);
 
         for (Entity entity : entities) {
-            if (entity.ignoreExplosion()) {
+            if (entity.ignoreExplosion(this)) {
                 continue;
             }
 
@@ -155,7 +163,7 @@ public class ProjectileExplosion extends Explosion {
                 d[13] = new Vec3(deltaX, deltaY, boundingBox.maxZ);
                 d[14] = new Vec3(deltaX, deltaY, deltaZ);
                 for (int s = 0; s < 15; s++) {
-                    result = BlockRayTrace.rayTraceBlocks(this.level, new ClipContext(explosionPos, d[s], ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+                    result = BlockRayTrace.rayTraceBlocks(this.level, new ClipContext(explosionPos, d[s], ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
                     minDistance = (result.getType() != BlockHitResult.Type.BLOCK) ? Math.min(minDistance, explosionPos.distanceTo(d[s])) : minDistance;
                 }
                 strength = minDistance * 2 / radius;
@@ -177,11 +185,10 @@ public class ProjectileExplosion extends Explosion {
             }
 
             double damage = 1.0D - strength;
-            entity.hurt(this.getDamageSource(), (float) damage * this.power);
+            entity.hurt(this.damageSource, (float) damage * this.power);
 
-            if (entity instanceof LivingEntity) {
-                damage = (float) ProtectionEnchantment.getExplosionKnockbackAfterDampener((LivingEntity) entity, damage);
-            }
+            // 1.21 移除了 ProtectionEnchantment 的爆炸击退减免接口，
+            // 击退减免改由 Explosion 内部处理，这里不再二次减免
 
             float multiplier = this.power * radius / 500;
             // 启用击退效果

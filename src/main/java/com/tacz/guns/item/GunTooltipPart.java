@@ -3,6 +3,7 @@ package com.tacz.guns.item;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
+import com.tacz.guns.api.item.nbt.ItemNbtHelper;
 
 public enum GunTooltipPart {
     DESCRIPTION,
@@ -19,14 +20,14 @@ public enum GunTooltipPart {
     }
 
     public static int getHideFlags(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
+        CompoundTag tag = ItemNbtHelper.getTag(stack);
         if (tag != null && tag.contains("HideFlags", Tag.TAG_ANY_NUMERIC)) {
             return tag.getInt("HideFlags");
         }
-        return stack.getItem().getDefaultTooltipHideFlags(stack);
+        return 0;
     }
 
     public static void setHideFlags(ItemStack stack, int mask) {
-        stack.getOrCreateTag().putInt("HideFlags", mask);
+        ItemNbtHelper.getOrCreateTag(stack).putInt("HideFlags", mask);
     }
 }

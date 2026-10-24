@@ -3,11 +3,14 @@ package com.tacz.guns.compat.controllable;
 import com.mrcrayfish.controllable.Controllable;
 import com.mrcrayfish.controllable.client.binding.BindingRegistry;
 import com.mrcrayfish.controllable.client.binding.ButtonBinding;
-import com.mrcrayfish.controllable.client.binding.IBindingContext;
+import com.mrcrayfish.controllable.client.binding.context.BindingContext;
+import com.mrcrayfish.controllable.client.binding.context.InGameContext;
+import com.mrcrayfish.controllable.client.binding.handlers.EmptyHandler;
 import com.mrcrayfish.controllable.client.input.Buttons;
 import com.mrcrayfish.controllable.client.input.Controller;
 import com.mrcrayfish.controllable.event.ControllerEvents;
 import com.mrcrayfish.controllable.event.Value;
+import com.mrcrayfish.controllable.util.Utils;
 import com.mrcrayfish.framework.api.event.TickEvents;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
@@ -22,16 +25,16 @@ import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import java.util.EnumMap;
 
 public class ControllableInner {
-    public static final IBindingContext GUN_KEY_CONFLICT = new GunKeyConflict();
-    public static final ButtonBinding AIM = new ButtonBinding(Buttons.LEFT_TRIGGER, "key.tacz.aim.desc", "key.category.tacz", GUN_KEY_CONFLICT);
-    public static final ButtonBinding SHOOT = new ButtonBinding(Buttons.RIGHT_TRIGGER, "key.tacz.shoot.desc", "key.category.tacz", GUN_KEY_CONFLICT);
-    public static final ButtonBinding RELOAD = new ButtonBinding(Buttons.B, "key.tacz.reload.desc", "key.category.tacz", GUN_KEY_CONFLICT);
-    public static final ButtonBinding MELEE = new ButtonBinding(Buttons.X, "key.tacz.melee.desc", "key.category.tacz", GUN_KEY_CONFLICT);
-    public static final ButtonBinding ZOOM = new ButtonBinding(Buttons.X, "key.tacz.zoom.desc", "key.category.tacz", GUN_KEY_CONFLICT);
-    public static final ButtonBinding CRAWL = new ButtonBinding(Buttons.LEFT_THUMB_STICK, "key.tacz.crawl.desc", "key.category.tacz", GUN_KEY_CONFLICT);
-    public static final ButtonBinding FIRE_SELECT = new ButtonBinding(Buttons.DPAD_LEFT, "key.tacz.fire_select.desc", "key.category.tacz", GUN_KEY_CONFLICT);
-    public static final ButtonBinding INTERACT = new ButtonBinding(-1, "key.tacz.interact.desc", "key.category.tacz", GUN_KEY_CONFLICT);
-    public static final ButtonBinding INSPECT = new ButtonBinding(-1, "key.tacz.inspect.desc", "key.category.tacz", GUN_KEY_CONFLICT);
+    public static final BindingContext GUN_KEY_CONFLICT = new GunKeyConflict();
+    public static final ButtonBinding AIM = new ButtonBinding(Buttons.LEFT_TRIGGER, "key.tacz.aim.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
+    public static final ButtonBinding SHOOT = new ButtonBinding(Buttons.RIGHT_TRIGGER, "key.tacz.shoot.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
+    public static final ButtonBinding RELOAD = new ButtonBinding(Buttons.B, "key.tacz.reload.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
+    public static final ButtonBinding MELEE = new ButtonBinding(Buttons.X, "key.tacz.melee.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
+    public static final ButtonBinding ZOOM = new ButtonBinding(Buttons.X, "key.tacz.zoom.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
+    public static final ButtonBinding CRAWL = new ButtonBinding(Buttons.LEFT_THUMB_STICK, "key.tacz.crawl.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
+    public static final ButtonBinding FIRE_SELECT = new ButtonBinding(Buttons.DPAD_LEFT, "key.tacz.fire_select.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
+    public static final ButtonBinding INTERACT = new ButtonBinding(-1, "key.tacz.interact.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
+    public static final ButtonBinding INSPECT = new ButtonBinding(-1, "key.tacz.inspect.desc", "key.category.tacz", GUN_KEY_CONFLICT, EmptyHandler.INSTANCE);
 
     public static void init() {
         BindingRegistry.getInstance().register(AIM);
@@ -49,7 +52,7 @@ public class ControllableInner {
     }
 
     public static boolean onButtonInput(Controller controller, Value<Integer> newButton, int originalButton, boolean isPress) {
-        if (!GUN_KEY_CONFLICT.isActive()) {
+        if (!isGunContextActive()) {
             return false;
         }
         if (AIM.getButton() == newButton.get() && AimKey.onAimControllerPress(isPress)) {
@@ -80,7 +83,7 @@ public class ControllableInner {
     }
 
     public static void onClientTickEnd() {
-        if (!GUN_KEY_CONFLICT.isActive()) {
+        if (!isGunContextActive()) {
             return;
         }
         Controller controller = Controllable.getController();
@@ -115,16 +118,35 @@ public class ControllableInner {
         });
     }
 
-    public static class GunKeyConflict implements IBindingContext {
-        @Override
-        public boolean isActive() {
-            LocalPlayer player = Minecraft.getInstance().player;
-            return !KeyConflictContext.GUI.isActive() && player != null && IGun.mainHandHoldGun(player);
+    /**
+     * 枪械按键上下文：没有打开任何界面、且存在玩家时激活。
+     * <p>
+     * Controllable 0.25.4 把 1.20.1 的 {@code IBindingContext}（只有 isActive/conflicts）换成了
+     * {@code BindingContext} + {@code ContextRule} 的规则模型：
+     * <ul>
+     *   <li>{@code BindingContext} 的构造器是包私有的，跨包无法直接继承，只能继承它 public 的子类
+     *       {@code InGameContext}（构造器 protected，规则 = NoScreenRule + HasPlayerRule）；</li>
+     *   <li>{@code ContextRule} 是 sealed 类（javap -v 显示 PermittedSubclasses 只有
+     *       HasPlayerRule / NoScreenRule / HasScreenRule），无法再为“手持枪械”新增自定义规则。</li>
+     * </ul>
+     * 所以“主手持有枪械”这条判定从上下文挪到 {@link #isGunContextActive()}，由 TACZ 自己的按键入口
+     * 过滤——最终生效条件和 1.20.1 的 isActive() 完全一致。
+     */
+    public static final class GunKeyConflict extends InGameContext {
+        public GunKeyConflict() {
+            super(Utils.resource("tacz_gun_conflict"));
         }
+    }
 
-        @Override
-        public boolean conflicts(IBindingContext other) {
-            return this == other;
+    /**
+     * 等价于 1.20.1 里 {@code GUN_KEY_CONFLICT.isActive()}：
+     * {@code !KeyConflictContext.GUI.isActive() && player != null && IGun.mainHandHoldGun(player)}。
+     */
+    private static boolean isGunContextActive() {
+        if (!GUN_KEY_CONFLICT.isActive()) {
+            return false;
         }
+        LocalPlayer player = Minecraft.getInstance().player;
+        return !KeyConflictContext.GUI.isActive() && player != null && IGun.mainHandHoldGun(player);
     }
 }

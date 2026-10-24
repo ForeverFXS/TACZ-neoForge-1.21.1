@@ -32,6 +32,7 @@ import org.luaj.vm2.LuaTable;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import com.tacz.guns.api.item.nbt.ItemNbtHelper;
 
 @SuppressWarnings("unused")
 public class GunAnimationStateContext extends ItemAnimationStateContext {
@@ -451,8 +452,8 @@ public class GunAnimationStateContext extends ItemAnimationStateContext {
             gunData = TimelessAPI.getClientGunIndex(iGun.getGunId(currentGunItem))
                     .map(ClientGunIndex::getGunData).orElse(null);
         }
-        if (currentGunItem.hasTag()) {
-            nbtUtil = new LuaNbtAccessor(currentGunItem.getTag());
+        if (ItemNbtHelper.hasTag(currentGunItem)) {
+            nbtUtil = new LuaNbtAccessor(ItemNbtHelper.getTag(currentGunItem));
         }
     }
 }

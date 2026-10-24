@@ -7,6 +7,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.UUID;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 /**
  * Framework provided serializers used for creating a {@link SyncedDataKey}. This covers all
@@ -17,6 +21,14 @@ import java.util.UUID;
  * Open source at <a href="https://github.com/MrCrayfish/Framework">Github</a> under LGPL License.
  */
 public class Serializers {
+    /**
+     * 1.21：ItemStack 的 NBT 读写需要 {@link HolderLookup.Provider}。本序列化器只保存内置注册表能解析的
+     * 组件（枪械物品栈不含附魔/伤害类型等数据包注册表组件），因此用内置注册表构建只读 Provider。
+     */
+    private static HolderLookup.Provider itemRegistries() {
+        return RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
+    }
+
     public static final IDataSerializer<Boolean> BOOLEAN = new IDataSerializer<>() {
         @Override
         public void write(FriendlyByteBuf buf, Boolean value) {
@@ -288,22 +300,23 @@ public class Serializers {
     public static final IDataSerializer<ItemStack> ITEM_STACK = new IDataSerializer<>() {
         @Override
         public void write(FriendlyByteBuf buf, ItemStack value) {
-            buf.writeItem(value);
+            // 1.21：ItemStack 改走 DataComponent 流式编解码，网络缓冲区本身携带注册表
+            ItemStack.OPTIONAL_STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, value);
         }
 
         @Override
         public ItemStack read(FriendlyByteBuf buf) {
-            return buf.readItem();
+            return ItemStack.OPTIONAL_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
         }
 
         @Override
         public Tag write(ItemStack value) {
-            return value.save(new CompoundTag());
+            return value.saveOptional(itemRegistries());
         }
 
         @Override
         public ItemStack read(Tag tag) {
-            return ItemStack.of((CompoundTag) tag);
+            return ItemStack.parseOptional(itemRegistries(), (CompoundTag) tag);
         }
     };
 

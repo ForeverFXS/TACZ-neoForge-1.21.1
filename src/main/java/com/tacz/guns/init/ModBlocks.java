@@ -19,13 +19,13 @@ public class ModBlocks {
     public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, GunMod.MOD_ID);
 
     // 旧方块就让他独占一个了
-    public static DeferredHolder<Block, Block> GUN_SMITH_TABLE = BLOCKS.register("gun_smith_table", GunSmithTableBlockB::new);
-    public static DeferredHolder<Block, Block> WORKBENCH_111 = BLOCKS.register("workbench_a", GunSmithTableBlockA::new);
-    public static DeferredHolder<Block, Block> WORKBENCH_211 = BLOCKS.register("workbench_b", GunSmithTableBlockB::new);
-    public static DeferredHolder<Block, Block> WORKBENCH_121 = BLOCKS.register("workbench_c", GunSmithTableBlockC::new);
+    public static DeferredHolder<Block, Block> GUN_SMITH_TABLE = BLOCKS.register("gun_smith_table", () -> new GunSmithTableBlockB());
+    public static DeferredHolder<Block, Block> WORKBENCH_111 = BLOCKS.register("workbench_a", () -> new GunSmithTableBlockA());
+    public static DeferredHolder<Block, Block> WORKBENCH_211 = BLOCKS.register("workbench_b", () -> new GunSmithTableBlockB());
+    public static DeferredHolder<Block, Block> WORKBENCH_121 = BLOCKS.register("workbench_c", () -> new GunSmithTableBlockC());
 
-    public static DeferredHolder<Block, Block> TARGET = BLOCKS.register("target", TargetBlock::new);
-    public static DeferredHolder<Block, Block> STATUE = BLOCKS.register("statue", StatueBlock::new);
+    public static DeferredHolder<Block, Block> TARGET = BLOCKS.register("target", () -> new TargetBlock());
+    public static DeferredHolder<Block, Block> STATUE = BLOCKS.register("statue", () -> new StatueBlock());
 
     public static DeferredHolder<BlockEntityType<?>, BlockEntityType<GunSmithTableBlockEntity>> GUN_SMITH_TABLE_BE = TILE_ENTITIES.register("gun_smith_table", () -> GunSmithTableBlockEntity.TYPE);
     public static DeferredHolder<BlockEntityType<?>, BlockEntityType<TargetBlockEntity>> TARGET_BE = TILE_ENTITIES.register("target", () -> TargetBlockEntity.TYPE);

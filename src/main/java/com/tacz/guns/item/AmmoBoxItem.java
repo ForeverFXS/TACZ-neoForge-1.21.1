@@ -33,8 +33,9 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
+import com.tacz.guns.api.item.nbt.ItemNbtHelper;
 
-public class AmmoBoxItem extends Item implements DyeableLeatherItem, AmmoBoxItemDataAccessor {
+public class AmmoBoxItem extends Item implements AmmoBoxItemDataAccessor {
     public static final ResourceLocation PROPERTY_NAME = ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "ammo_statue");
 
     public static final int IRON_LEVEL = 0;
@@ -90,7 +91,8 @@ public class AmmoBoxItem extends Item implements DyeableLeatherItem, AmmoBoxItem
     }
 
     private static int getTagColor(ItemStack stack) {
-        CompoundTag compoundtag = stack.getTagElement(DISPLAY_TAG);
+        CompoundTag rootTag = ItemNbtHelper.getTag(stack);
+        CompoundTag compoundtag = rootTag == null || !rootTag.contains(DISPLAY_TAG, Tag.TAG_COMPOUND) ? null : rootTag.getCompound(DISPLAY_TAG);
         return compoundtag != null && compoundtag.contains(COLOR_TAG, Tag.TAG_ANY_NUMERIC) ? compoundtag.getInt(COLOR_TAG) : 0x727d6b;
     }
 
@@ -274,7 +276,7 @@ public class AmmoBoxItem extends Item implements DyeableLeatherItem, AmmoBoxItem
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level pLevel, List<Component> components, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> components, TooltipFlag isAdvanced) {
         if (isAllTypeCreative(stack)) {
             components.add(Component.translatable("tooltip.tacz.ammo_box.usage.all_type_creative").withStyle(ChatFormatting.GOLD));
             return;

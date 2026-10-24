@@ -2,8 +2,10 @@ package com.tacz.guns.util;
 
 import com.tacz.guns.config.common.AmmoConfig;
 import com.tacz.guns.util.block.ProjectileExplosion;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Explosion;
@@ -17,14 +19,11 @@ public class ExplodeUtil {
             return;
         }
         // 依据配置文件读取方块破坏方式
-        Explosion.BlockInteraction mode = Explosion.BlockInteraction.KEEP;
-        if (destroy) {
-            mode = Explosion.BlockInteraction.DESTROY;
-        }
+        final Explosion.BlockInteraction mode = destroy ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP;
         // 创建爆炸
         ProjectileExplosion explosion = new ProjectileExplosion(level, owner, exploder, null, null, hitPos.x(), hitPos.y(), hitPos.z(), damage, radius, knockback, mode);
         // 监听 forge 事件
-        if (ForgeEventFactory.onExplosionStart(level, explosion)) {
+        if (EventHooks.onExplosionStart(level, explosion)) {
             return;
         }
         // 执行爆炸逻辑
@@ -35,7 +34,7 @@ public class ExplodeUtil {
         }
         // 客户端发包，发送爆炸相关信息
         level.players().stream().filter(player -> Mth.sqrt((float) player.distanceToSqr(hitPos)) < AmmoConfig.EXPLOSIVE_AMMO_VISIBLE_DISTANCE.get()).forEach(player -> {
-            ClientboundExplodePacket packet = new ClientboundExplodePacket(hitPos.x(), hitPos.y(), hitPos.z(), radius, explosion.getToBlow(), explosion.getHitPlayers().get(player));
+            ClientboundExplodePacket packet = new ClientboundExplodePacket(hitPos.x(), hitPos.y(), hitPos.z(), radius, explosion.getToBlow(), explosion.getHitPlayers().get(player), mode, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
             player.connection.send(packet);
         });
     }

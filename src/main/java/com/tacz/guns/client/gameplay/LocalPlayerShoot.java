@@ -155,7 +155,9 @@ public class LocalPlayerShoot {
             return ShootResult.IS_SPRINTING;
         }
         // 触发开火事件
-        if (NeoForge.EVENT_BUS.post(new GunShootEvent(player, mainHandItem, LogicalSide.CLIENT))) {
+        GunShootEvent gunShootEvent = new GunShootEvent(player, mainHandItem, LogicalSide.CLIENT);
+        NeoForge.EVENT_BUS.post(gunShootEvent);
+        if (gunShootEvent.isCanceled()) {
             return ShootResult.FORGE_EVENT_CANCEL;
         }
         // 切换状态锁，不允许换弹、检视等行为进行。
@@ -289,7 +291,9 @@ public class LocalPlayerShoot {
             // 播放声音和状态机触发需要从异步线程上传到主线程执行，否则会引起cme
             Minecraft.getInstance().submitAsync(() -> {
                 // 触发击发事件
-                boolean fire = !NeoForge.EVENT_BUS.post(new GunFireEvent(player, mainHandItem, LogicalSide.CLIENT));
+                GunFireEvent gunFireEvent = new GunFireEvent(player, mainHandItem, LogicalSide.CLIENT);
+                NeoForge.EVENT_BUS.post(gunFireEvent);
+                boolean fire = !gunFireEvent.isCanceled();
                 if (fire) {
                     // 动画和声音循环播放
                     AnimationStateMachine<?> animationStateMachine = display.getAnimationStateMachine();

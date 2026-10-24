@@ -8,10 +8,13 @@ import com.tacz.guns.resource.CommonAssetsManager;
 import com.tacz.guns.resource.pojo.data.block.TabConfig;
 import com.tacz.guns.resource.pojo.data.recipe.GunResult;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.crafting.CraftingHelper;
+import com.tacz.guns.util.ItemStackJsonHelper;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import java.lang.reflect.Type;
 
@@ -30,7 +33,7 @@ public class GunSmithTableResultSerializer implements JsonDeserializer<GunSmithT
                 count = Math.max(GsonHelper.getAsInt(jsonObject, "count"), 1);
             }
             if (jsonObject.has("nbt")) {
-                extraTag = CraftingHelper.getNBT(jsonObject.get("nbt"));
+                extraTag = parseNbt(jsonObject.get("nbt"));
             }
             if (jsonObject.has("group")) {
                 String raw = GsonHelper.getAsString(jsonObject, "group");
@@ -58,7 +61,7 @@ public class GunSmithTableResultSerializer implements JsonDeserializer<GunSmithT
                 }
                 case GunSmithTableResult.CUSTOM -> {
                     JsonObject resultObject = GsonHelper.getAsJsonObject(jsonObject, "item");
-                    ItemStack itemStack = CraftingHelper.getItemStack(resultObject, true);
+                    ItemStack itemStack = ItemStackJsonHelper.getItemStack(resultObject, true);
                     result = new GunSmithTableResult(itemStack, tabOverride);
                 }
                 default -> {
@@ -72,5 +75,18 @@ public class GunSmithTableResultSerializer implements JsonDeserializer<GunSmithT
 
     private ResourceLocation getId(JsonObject jsonObject) {
         return ResourceLocation.parse(GsonHelper.getAsString(jsonObject, "id"));
+    }
+    /**
+     * 1.21 移除了 {@code CraftingHelper.getNBT}。原版行为：nbt 成员是 SNBT 字符串时才解析。
+     */
+    private static CompoundTag parseNbt(JsonElement element) {
+        if (element == null || !element.isJsonPrimitive()) {
+            return null;
+        }
+        try {
+            return TagParser.parseTag(element.getAsString());
+        } catch (CommandSyntaxException e) {
+            throw new JsonSyntaxException("Invalid nbt: " + element, e);
+        }
     }
 }

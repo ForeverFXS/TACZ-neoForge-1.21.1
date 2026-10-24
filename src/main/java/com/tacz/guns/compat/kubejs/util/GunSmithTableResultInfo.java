@@ -1,17 +1,20 @@
 package com.tacz.guns.compat.kubejs.util;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.JsonOps;
+import com.tacz.guns.api.item.nbt.ItemNbtHelper;
 import com.tacz.guns.crafting.result.GunSmithTableResult;
-import dev.latvian.mods.kubejs.item.ItemStackJS;
-import dev.latvian.mods.kubejs.item.OutputItem;
-import dev.latvian.mods.kubejs.registry.RegistryInfo;
-import dev.latvian.mods.kubejs.util.JsonIO;
-import dev.latvian.mods.kubejs.util.UtilsJS;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.crafting.CraftingHelper;
 
 public class GunSmithTableResultInfo {
     private static final String TYPE_KEY = "type";
@@ -38,13 +41,18 @@ public class GunSmithTableResultInfo {
         return new GunSmithTableResultInfo(jsonObject);
     }
 
+    /**
+     * 1.21 迁移：{@code RegistryInfo.ITEM.getId(...)}（kubejs 2001）→ {@link BuiltInRegistries#ITEM} 的注册名；
+     * {@code stack.getTag()/getOrCreateTag()}（1.20 的 ItemStack）→ {@link ItemNbtHelper}（CustomData 承载）。
+     */
     public static GunSmithTableResultInfo createFromItemStack(ItemStack stack) {
         GunSmithTableResultInfo info = create().setType(GunSmithTableResult.CUSTOM);
         JsonObject itemJson = new JsonObject();
-        itemJson.addProperty("item", RegistryInfo.ITEM.getId(stack.getItem()).toString());
+        itemJson.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
         itemJson.addProperty("count", stack.getCount());
-        if (JsonIO.of(stack.getTag()) != null) {
-            itemJson.addProperty("nbt", stack.getOrCreateTag().toString());
+        CompoundTag tag = ItemNbtHelper.getTag(stack);
+        if (tag != null) {
+            itemJson.addProperty("nbt", tag.toString());
         }
         info.setCustomItem(itemJson);
         return info;
@@ -52,9 +60,19 @@ public class GunSmithTableResultInfo {
 
     /**
      * {@link GunSmithTableResultInfo}的TypeWrapper, 将其他类型转为{@link GunSmithTableResultInfo}
-     * object为其他类型时优先解析{@link JsonObject}，其次{@link OutputItem}，再其次{@link ItemStack}
-     * 之后尝试转化为{@link String}解析为{@link ResourceLocation}
-     * 以上均不成功时最终{@link JsonIO#of(Object)}解析
+     * object为其他类型时优先解析{@link JsonObject}，其次{@link ItemStack}，
+     * 之后尝试转化为{@link String}解析为{@link ResourceLocation}。
+     * <p>
+     * 1.21 迁移（kubejs 2101 实测缺失项，javap 实证）：
+     * <ul>
+     *   <li>{@code OutputItem} 类型已不存在 —— 分支删除，脚本传自定义物品请直接给 {@link ItemStack} 或 JSON；</li>
+     *   <li>{@code ItemStackJS.of(Object)} 已不存在（2101 只剩 {@code wrap/getRawItem/...} 静态工具）——
+     *       该兜底分支删除；</li>
+     *   <li>{@code UtilsJS.getMCID(null, String)} 已不存在 —— 换成 {@link ResourceLocation#tryParse(String)}；</li>
+     *   <li>{@code JsonIO.of(Object)} 已不存在 —— 换成“已经就是 {@link JsonElement} 才按 JSON 解析”，
+     *       其余无法识别的对象抛 {@link IllegalArgumentException}（<b>不再静默</b>吞成空 JSON）。</li>
+     * </ul>
+     *
      * @param object 输入待转化对象
      * @return {@link GunSmithTableResultInfo}
      */
@@ -63,25 +81,23 @@ public class GunSmithTableResultInfo {
             return info;
         } else if (object instanceof JsonObject jsonObject) {
             return createFromJson(jsonObject);
-        }else if (object instanceof OutputItem outputItem) {
-            return createFromItemStack(outputItem.item);
         } else if (object instanceof ItemStack stack) {
             return createFromItemStack(stack);
+        } else if (object instanceof JsonElement element && element.isJsonObject()) {
+            return createFromJson(element.getAsJsonObject());
         }
-        String idString = object.toString();
-        if (ResourceLocation.isValidResourceLocation(idString)) {
-            ResourceLocation rl = UtilsJS.getMCID(null, idString);
-            TimelessItemWrapper.ItemIndexInfo indexInfo = TimelessItemWrapper.ItemIndexInfo.createFromResourceLocation(rl);
-            if (indexInfo.isValidForRecipe()) {
-                return create().setType(indexInfo.getParent()).setId(indexInfo.getIndexId());
+        if (object instanceof CharSequence || object instanceof ResourceLocation) {
+            String idString = object.toString();
+            ResourceLocation rl = ResourceLocation.tryParse(idString);
+            if (rl != null) {
+                TimelessItemWrapper.ItemIndexInfo indexInfo = TimelessItemWrapper.ItemIndexInfo.createFromResourceLocation(rl);
+                if (indexInfo.isValidForRecipe()) {
+                    return create().setType(indexInfo.getParent()).setId(indexInfo.getIndexId());
+                }
             }
         }
-        ItemStack stack = ItemStackJS.of(object);
-        if (!stack.isEmpty()) {
-            return createFromItemStack(stack);
-        }
-        //以上都不匹配，默认按JsonObject处理
-        return createFromJson(JsonIO.of(object).getAsJsonObject());
+        throw new IllegalArgumentException("Cannot convert " + (object == null ? "null" : object.getClass().getName())
+                + " to GunSmithTableResultInfo, expected a JsonObject, an ItemStack, or an item id string");
     }
 
     public String getType() {
@@ -102,8 +118,35 @@ public class GunSmithTableResultInfo {
         return this;
     }
 
+    /**
+     * 1.21 迁移：{@code CraftingHelper.getNBT(JsonElement)} 已被 NeoForge 移除（javap 实证：
+     * {@code CraftingHelper} 只剩 {@code makeIngredientCodec/makeIngredientMapCodec}），
+     * 这里就地实现等价解析：SNBT 字符串走 {@link TagParser#parseTag(String)}，
+     * JSON 对象走 {@code JsonOps → NbtOps} 转换。
+     */
     public CompoundTag getNbt() {
-        return CraftingHelper.getNBT(this.json.get(NBT_KEY));
+        JsonElement element = this.json.get(NBT_KEY);
+        if (element == null || element.isJsonNull()) {
+            return null;
+        }
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+            String snbt = element.getAsString();
+            if (snbt.isEmpty()) {
+                return null;
+            }
+            try {
+                return TagParser.parseTag(snbt);
+            } catch (CommandSyntaxException e) {
+                throw new JsonParseException("Invalid nbt of gun smith table result: " + e.getMessage(), e);
+            }
+        }
+        if (element.isJsonObject()) {
+            Tag tag = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, element);
+            if (tag instanceof CompoundTag compoundTag) {
+                return compoundTag;
+            }
+        }
+        throw new JsonParseException("Invalid nbt of gun smith table result, expected a SNBT string or a json object, got " + element);
     }
 
     public GunSmithTableResultInfo setNbt(CompoundTag nbt) {

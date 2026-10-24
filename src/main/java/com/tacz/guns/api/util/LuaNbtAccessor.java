@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
+import com.tacz.guns.api.item.nbt.ItemNbtHelper;
 
 /**
  * 一个简单的NBT包装，用于在Lua中访问NBT数据。<br/>
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.ApiStatus;
 public record LuaNbtAccessor(CompoundTag nbt) {
 
     public static LuaNbtAccessor from(ItemStack stack) {
-        return new LuaNbtAccessor(stack.getTag());
+        return new LuaNbtAccessor(ItemNbtHelper.getTag(stack));
     }
 
     public static LuaNbtAccessor from(CompoundTag nbt) {

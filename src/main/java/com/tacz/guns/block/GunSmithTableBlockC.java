@@ -1,5 +1,6 @@
 package com.tacz.guns.block;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -8,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LevelEvent;
@@ -26,7 +28,21 @@ public class GunSmithTableBlockC extends AbstractGunSmithTableBlock {
 
     public GunSmithTableBlockC() {
         super();
+        registerPartDefaultState();
+    }
+
+    public GunSmithTableBlockC(Properties properties) {
+        super(properties);
+        registerPartDefaultState();
+    }
+
+    private void registerPartDefaultState() {
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(HALF, DoubleBlockHalf.LOWER));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(GunSmithTableBlockC::new);
     }
 
 
@@ -76,7 +92,7 @@ public class GunSmithTableBlockC extends AbstractGunSmithTableBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player) {
         // 用于抑制创造模式下摧毁upper方块时lower的掉落
         if (!level.isClientSide && player.isCreative()) {
             DoubleBlockHalf half = blockState.getValue(HALF);
@@ -89,7 +105,7 @@ public class GunSmithTableBlockC extends AbstractGunSmithTableBlock {
                 }
             }
         }
-        super.playerWillDestroy(level, pos, blockState, player);
+        return super.playerWillDestroy(level, pos, blockState, player);
     }
 
     @Override

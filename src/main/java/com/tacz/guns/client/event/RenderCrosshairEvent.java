@@ -1,7 +1,6 @@
 package com.tacz.guns.client.event;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.api.TimelessAPI;
@@ -60,7 +59,7 @@ public class RenderCrosshairEvent {
             // 全面替换成自己的
             event.setCanceled(true);
             // 击中显示
-            renderHitMarker(event.getGuiGraphics(), event.getWindow());
+            renderHitMarker(event.getGuiGraphics());
             // 换弹进行时取消准心渲染
             ReloadState reloadState = IGunOperator.fromLivingEntity(player).getSynReloadState();
             if (reloadState.getStateType().isReloading()) {
@@ -79,7 +78,7 @@ public class RenderCrosshairEvent {
             IClientPlayerGunOperator playerGunOperator = IClientPlayerGunOperator.fromLocalPlayer(player);
             TimelessAPI.getGunDisplay(stack).ifPresent(gunIndex -> {
                 // 瞄准快要完成时，取消准心渲染
-                if (playerGunOperator.getClientAimingProgress(event.getPartialTick()) > 0.9) {
+                if (playerGunOperator.getClientAimingProgress(event.getPartialTick().getGameTimeDeltaPartialTick(true)) > 0.9) {
                     // 枪包可以强制显示准星
                     boolean forceShow = gunIndex.isShowCrosshair();
                     // 越肩视角可以强制显示准星
@@ -92,12 +91,12 @@ public class RenderCrosshairEvent {
 
                 AnimationStateMachine<?> animationStateMachine = gunIndex.getAnimationStateMachine();
                 if (animationStateMachine == null) {
-                    renderCrosshair(event.getGuiGraphics(), event.getWindow());
+                    renderCrosshair(event.getGuiGraphics());
                     return;
                 }
                 AnimationStateContext context = animationStateMachine.getContext();
                 if (context == null || !context.shouldHideCrossHair()) {
-                    renderCrosshair(event.getGuiGraphics(), event.getWindow());
+                    renderCrosshair(event.getGuiGraphics());
                 }
             });
         }
@@ -109,7 +108,7 @@ public class RenderCrosshairEvent {
         isRefitScreen = Minecraft.getInstance().screen instanceof GunRefitScreen;
     }
 
-    private static void renderCrosshair(GuiGraphics graphics, Window window) {
+    private static void renderCrosshair(GuiGraphics graphics) {
         Options options = Minecraft.getInstance().options;
         // 越肩视角可以强制显示准星
         boolean shoulderSurfingForceShow = ShoulderSurfingCompat.showCrosshair();
@@ -126,8 +125,8 @@ public class RenderCrosshairEvent {
         if (gameMode.getPlayerMode() == GameType.SPECTATOR) {
             return;
         }
-        int width = window.getGuiScaledWidth();
-        int height = window.getGuiScaledHeight();
+        int width = graphics.guiWidth();
+        int height = graphics.guiHeight();
 
         ResourceLocation location = CrosshairType.getTextureLocation(RenderConfig.CROSSHAIR_TYPE.get());
 
@@ -139,7 +138,7 @@ public class RenderCrosshairEvent {
         graphics.blit(location, (int) x, (int) y, 0, 0, 16, 16, 16, 16);
     }
 
-    private static void renderHitMarker(GuiGraphics graphics, Window window) {
+    private static void renderHitMarker(GuiGraphics graphics) {
         long remainHitTime = System.currentTimeMillis() - hitTimestamp;
         long remainKillTime = System.currentTimeMillis() - killTimestamp;
         long remainHeadShotTime = System.currentTimeMillis() - headShotTimestamp;
@@ -158,8 +157,8 @@ public class RenderCrosshairEvent {
             fadeTime = remainKillTime;
         }
 
-        int width = window.getGuiScaledWidth();
-        int height = window.getGuiScaledHeight();
+        int width = graphics.guiWidth();
+        int height = graphics.guiHeight();
         float x = width / 2f - 8;
         float y = height / 2f - 8;
 

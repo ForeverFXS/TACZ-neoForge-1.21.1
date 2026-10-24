@@ -82,7 +82,9 @@ public class LocalPlayerReload {
             data.lockState(operator -> operator.getSynReloadState().getStateType().isReloading());
             data.chargeProgress = 0f;
             // 触发换弹事件
-            if (NeoForge.EVENT_BUS.post(new GunReloadEvent(player, player.getMainHandItem(), LogicalSide.CLIENT))) {
+            GunReloadEvent gunReloadEvent = new GunReloadEvent(player, player.getMainHandItem(), LogicalSide.CLIENT);
+            NeoForge.EVENT_BUS.post(gunReloadEvent);
+            if (gunReloadEvent.isCanceled()) {
                 return;
             }
             // 发包通知服务器

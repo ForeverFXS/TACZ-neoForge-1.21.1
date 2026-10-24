@@ -1,7 +1,7 @@
 package com.tacz.guns.compat.carryon;
 
 import com.tacz.guns.GunMod;
-import net.minecraftforge.fml.InterModComms;
+import net.neoforged.fml.InterModComms;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 public class BlackList {

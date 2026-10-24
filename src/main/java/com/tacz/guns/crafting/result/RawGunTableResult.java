@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.Locale;
+import com.tacz.guns.api.item.nbt.ItemNbtHelper;
 
 
 /**
@@ -54,7 +55,7 @@ public class RawGunTableResult {
             default -> new GunSmithTableResult(ItemStack.EMPTY, TabConfig.TAB_EMPTY);
         };
         if (raw.nbt != null) {
-            CompoundTag itemTag = result.getResult().getOrCreateTag();
+            CompoundTag itemTag = ItemNbtHelper.getOrCreateTag(result.getResult());
             for (String key : raw.nbt.getAllKeys()) {
                 Tag tag = raw.nbt.get(key);
                 if (tag != null) {

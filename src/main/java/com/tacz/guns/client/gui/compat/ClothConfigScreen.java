@@ -50,7 +50,7 @@ public class ClothConfigScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics gui, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(gui);
+        this.renderBackground(gui, pMouseX, pMouseY, pPartialTick);
         this.message.renderCentered(gui, this.width / 2, 80);
         super.render(gui, pMouseX, pMouseY, pPartialTick);
     }

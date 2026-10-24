@@ -6,6 +6,7 @@ import com.tacz.guns.client.model.bedrock.BedrockCubePerFace;
 import com.tacz.guns.client.model.bedrock.BedrockPart;
 import com.tacz.guns.client.resource.pojo.model.FaceUVsItem;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemDisplayContext;
 
@@ -29,7 +30,15 @@ public class SlotModel extends EntityModel<Entity> {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
         bone.render(poseStack, ItemDisplayContext.GUI, buffer, packedLight, packedOverlay);
+    }
+
+    /**
+     * 1.21 的 Model 只剩带 int color 的 renderToBuffer，这里保留旧版
+     * float 颜色分量重载给尚未迁移的调用方，颜色按 ARGB 打包后等价。
+     */
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        this.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
     }
 }

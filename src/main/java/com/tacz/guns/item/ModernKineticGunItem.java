@@ -46,6 +46,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.DoubleFunction;
 import java.util.function.Supplier;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 /**
  * 现代枪的逻辑实现
@@ -54,8 +56,8 @@ public class ModernKineticGunItem extends AbstractGunItem implements GunItemData
     public static final String TYPE_NAME = "modern_kinetic";
 
     private static final DoubleFunction<AttributeModifier> AM_FACTORY = amount -> new AttributeModifier(
-            UUID.randomUUID(), "TACZ Melee Damage",
-            amount, AttributeModifier.Operation.ADDITION
+            ResourceLocation.fromNamespaceAndPath(GunMod.MOD_ID, "melee_damage"),
+            amount, AttributeModifier.Operation.ADD_VALUE
     );
 
     public ModernKineticGunItem() {
@@ -513,13 +515,17 @@ public class ModernKineticGunItem extends AbstractGunItem implements GunItemData
             return;
         }
         target.knockback(knockback, (float) Math.sin(Math.toRadians(user.getYRot())), (float) -Math.cos(Math.toRadians(user.getYRot())));
+        DamageSource damageSource;
         if (user instanceof Player player) {
-            target.hurt(user.damageSources().playerAttack(player), damage);
+            damageSource = user.damageSources().playerAttack(player);
         } else {
-            target.hurt(user.damageSources().mobAttack(user), damage);
+            damageSource = user.damageSources().mobAttack(user);
         }
+        target.hurt(damageSource, damage);
         // 修复近战枪械不触发神化词条/宝石的bug
-        user.doEnchantDamageEffects(user, target);
+        if (user.level() instanceof ServerLevel serverLevel) {
+            EnchantmentHelper.doPostAttackEffects(serverLevel, target, damageSource);
+        }
 
         if (!target.isAlive()) {
             return;
@@ -531,7 +537,7 @@ public class ModernKineticGunItem extends AbstractGunItem implements GunItemData
             }
             int time = Math.max(0, data.getTime() * 20);
             int amplifier = Math.max(0, data.getAmplifier());
-            MobEffectInstance effectInstance = new MobEffectInstance(mobEffect, time, amplifier, false, data.isHideParticles());
+            MobEffectInstance effectInstance = new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(mobEffect), time, amplifier, false, data.isHideParticles());
             target.addEffect(effectInstance);
         }
         if (user.level() instanceof ServerLevel serverLevel) {

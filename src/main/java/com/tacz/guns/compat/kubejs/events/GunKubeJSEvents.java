@@ -9,9 +9,10 @@ import com.tacz.guns.api.event.server.AmmoHitBlockEvent;
 import com.tacz.guns.api.item.IGun;
 import dev.latvian.mods.kubejs.event.EventExit;
 import dev.latvian.mods.kubejs.event.EventGroup;
-import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.script.ScriptTypeHolder;
+import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 public class GunKubeJSEvents {
     public static final EventGroup GROUP = EventGroup.of("TimelessGunEvents");
 
-    public static abstract class GunEventJS<E extends Event> extends EventJS implements TimelessForgeEventWrappers.ForgeEventWrapper<E> {
+    public static abstract class GunEventJS<E extends Event> implements KubeEvent, TimelessForgeEventWrappers.ForgeEventWrapper<E> {
         protected final E event;
 
         public GunEventJS(E event) {
@@ -54,11 +55,12 @@ public class GunKubeJSEvents {
         }
 
         @Override
-        public Object cancel() throws EventExit {
+        public Object cancel(Context context) throws EventExit {
             if (event instanceof ICancellableEvent cancellable) {
                 cancellable.setCanceled(true);
             }
-            return super.cancel();
+            // KubeJS 2101: KubeEvent#cancel(Context) 的默认实现会抛出 INTERRUPT_FALSE 的 EventExit
+            return KubeEvent.super.cancel(context);
         }
     }
 

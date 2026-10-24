@@ -34,7 +34,7 @@ public class GunPackProgressScreen extends Screen implements ProgressListener {
         if (this.stop) {
             this.getMinecraft().setScreen(null);
         } else {
-            this.renderBackground(gui);
+            this.renderBackground(gui, mouseX, mouseY, partialTick);
             if (this.header != null) {
                 gui.drawCenteredString(this.font, this.header, this.width / 2, 70, 16777215);
             }
