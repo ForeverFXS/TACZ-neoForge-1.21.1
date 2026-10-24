@@ -16,6 +16,12 @@ base {
 // Mojang 自 1.20.5 起对终端用户投递 Java 21，模组应面向 Java 21
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+// 运行期“纯库”配置：这些 jar 只提供类、不是 mod，FML 的 game layer 默认看不到它们。
+// 必须挂到每个 run 的 additionalRuntimeClasspath，ModDevGradle 才会写进 legacyClasspath.txt。
+configurations {
+    devRuntimeLibs
+}
+
 neoForge {
     version = project.neo_version
 
@@ -56,6 +62,8 @@ neoForge {
         configureEach {
             systemProperty 'forge.logging.console.level', 'debug'
             logLevel = org.slf4j.event.Level.DEBUG
+            // 纯库 jar 进 legacyClasspath（否则 NoClassDefFoundError: org/luaj/vm2/LuaValue）
+            additionalRuntimeClasspathConfiguration.extendsFrom(configurations.devRuntimeLibs)
         }
     }
 
@@ -90,6 +98,14 @@ dependencies {
     implementation files('libs/luaj-core-3.0.8-figura.jar')
     implementation files('libs/luaj-jse-3.0.8-figura.jar')
 
+    // 同上：这些是纯库（无 mods.toml），运行期必须显式进入 legacyClasspath
+    devRuntimeLibs files('libs/luaj-core-3.0.8-figura.jar')
+    devRuntimeLibs files('libs/luaj-jse-3.0.8-figura.jar')
+    devRuntimeLibs files('libs/simplebedrockmodel-2.2.2-neoforge-mc1.21.1.jar')
+    devRuntimeLibs 'com.maydaymemory:mae:1.1.4'
+    devRuntimeLibs 'org.apache.commons:commons-math3:3.6.1'
+    devRuntimeLibs 'org.apache.bcel:bcel:6.6.1'
+
     // ============ Maven Central ============
     implementation("com.maydaymemory:mae:1.1.4") {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
@@ -112,6 +128,9 @@ dependencies {
     // 版本经 mod.mcimirror.top 查询、从 cdn.modrinth.com 下载
     compileOnly files('libs/kubejs-neoforge-2101.7.0-build.131.jar')
     compileOnly files('libs/rhino-2100.2.5-build.48.jar')
+    // 开发期把 KubeJS 当运行时 mod 加载：-cp 上的 mod jar 会被 FML 的 ClasspathLocator 识别为 mod 文件
+    runtimeOnly files('libs/kubejs-neoforge-2101.7.0-build.131.jar')
+    runtimeOnly files('libs/rhino-2100.2.5-build.48.jar')
     compileOnly files('libs/architectury-13.0.6-neoforge.jar')
 
     // ============ 本地 jar 化：CurseForge 依赖（cursemaven.com 本机被阻断）============
