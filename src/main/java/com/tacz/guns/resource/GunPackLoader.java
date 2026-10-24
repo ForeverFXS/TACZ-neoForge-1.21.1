@@ -6,12 +6,15 @@ import com.tacz.guns.GunMod;
 import com.tacz.guns.api.resource.ResourceManager;
 import com.tacz.guns.config.PreLoadConfig;
 import com.tacz.guns.util.GetJarResources;
-import cpw.mods.jarhandling.SecureJar;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.FilePackResources;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -20,10 +23,6 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
-import net.minecraftforge.forgespi.language.IModInfo;
-import net.minecraftforge.forgespi.locating.IModFile;
-import net.minecraftforge.resource.DelegatingPackResources;
-import net.minecraftforge.resource.PathPackResources;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -91,54 +90,46 @@ public enum GunPackLoader implements RepositorySource {
         GunMod.LOGGER.info(MARKER, "Start scanning for gun packs in {}", resourcePacksPath);
         List<GunPack> gunPacks = scanExtensions(resourcePacksPath);
         GunMod.LOGGER.info(MARKER, "Found {} possible gunpack(s) and added them to resource set.", gunPacks.size());
-        List<PathPackResources> extensionPacks = new ArrayList<>();
+        List<PackResources> extensionPacks = new ArrayList<>();
 
-        for(GunPack gunPack : gunPacks) {
-            PathPackResources packResources = new PathPackResources(gunPack.name, false, gunPack.path) {
-                private final SecureJar secureJar = SecureJar.from(gunPack.path);
-
-                @NotNull
-                protected Path resolve(String... paths) {
-                    if (paths.length < 1) {
-                        throw new IllegalArgumentException("Missing path");
-                    } else {
-                        return this.secureJar.getPath(String.join("/", paths));
-                    }
-                }
-
-                public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location) {
-                    return super.getResource(type, location);
-                }
-
-                public void listResources(PackType type, String namespace, String path, PackResources.ResourceOutput resourceOutput) {
-                    super.listResources(type, namespace, path, resourceOutput);
-                }
-            };
-            extensionPacks.add(packResources);
+        for (GunPack gunPack : gunPacks) {
+            PackLocationInfo packInfo = new PackLocationInfo(
+                    gunPack.name(), Component.literal(gunPack.name()), PackSource.BUILT_IN, Optional.empty());
+            if (Files.isDirectory(gunPack.path())) {
+                // 目录形态的枪包
+                extensionPacks.add(new PathPackResources(packInfo, gunPack.path()));
+            } else {
+                // zip 形态的枪包
+                extensionPacks.add(new FilePackResources(
+                        packInfo,
+                        new FilePackResources.SharedZipFileAccess(gunPack.path().toFile()),
+                        "tacz_" + gunPack.name()));
+            }
         }
 
+        PackLocationInfo location = new PackLocationInfo(
+                "tacz_resources", Component.literal("TACZ Resources"), PackSource.BUILT_IN, Optional.empty());
+        Pack.ResourcesSupplier supplier = new Pack.ResourcesSupplier() {
+            @Override
+            public PackResources openPrimary(PackLocationInfo info) {
+                return new TaczRootPackResources(info, packType, extensionPacks);
+            }
 
-        return Pack.readMetaAndCreate("tacz_resources", Component.literal("TACZ Resources"), true, (id) -> {
-            return new DelegatingPackResources(id, false, new PackMetadataSection(Component.translatable("tacz.resources.modresources"),
-                    SharedConstants.getCurrentVersion().getPackVersion(packType)), extensionPacks) {
-                public IoSupplier<InputStream> getRootResource(String... paths) {
-                    if (paths.length == 1 && paths[0].equals("pack.png")) {
-                        Path logoPath = getModIcon("tacz");
-                        if (logoPath != null) {
-                            return IoSupplier.create(logoPath);
-                        }
-                    }
-                    return null;
-                }
-            };
-        }, packType, Pack.Position.BOTTOM, PackSource.BUILT_IN);
+            @Override
+            public PackResources openFull(PackLocationInfo info, Pack.Metadata metadata) {
+                return openPrimary(info);
+            }
+        };
+        // required=true：与 1.20.1 实现一致，资源包默认启用，避免枪包在未勾选时不可用
+        return Pack.readMetaAndCreate(location, supplier, packType,
+                new PackSelectionConfig(true, Pack.Position.BOTTOM, false));
     }
 
     public static @Nullable Path getModIcon(String modId) {
         Optional<? extends ModContainer> m = ModList.get().getModContainerById(modId);
         if (m.isPresent()) {
-            IModInfo mod = m.get().getModInfo();
-            IModFile file = mod.getOwningFile().getFile();
+            // 1.21 的 IModInfo/IModFile 迁到 net.neoforged.neoforgespi.*，用 var 避免额外 import
+            var file = m.get().getModInfo().getOwningFile().getFile();
             if (file != null) {
                 Path logoPath = file.findResource("icon.png");
                 if (Files.exists(logoPath)) {
