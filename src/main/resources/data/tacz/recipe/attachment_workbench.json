@@ -1,9 +1,11 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "tacz:workbench_c",
-    "nbt": {
-      "BlockId": "tacz:attachment_workbench"
+    "id": "tacz:workbench_c",
+    "components": {
+      "minecraft:custom_data": {
+        "BlockId": "tacz:attachment_workbench"
+      }
     }
   },
   "pattern": [
@@ -13,10 +15,10 @@
   ],
   "key": {
     "G": {
-      "tag": "forge:glass"
+      "tag": "c:glass_blocks"
     },
     "I": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:ingots/iron"
     },
     "C": {
       "item": "minecraft:redstone_torch"
