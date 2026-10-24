@@ -37,11 +37,16 @@ import com.tacz.guns.util.block.BlockRayTrace;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -63,11 +68,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.common.NeoForge;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.fml.DistExecutor;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.LogicalSide;
-import net.minecraftforge.network.NetworkHooks;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -84,7 +87,7 @@ import static com.tacz.guns.api.event.common.GunDamageSourcePart.NON_ARMOR_PIERC
 /**
  * 动能武器打出的子弹实体。
  */
-public class EntityKineticBullet extends Projectile implements IEntityAdditionalSpawnData {
+public class EntityKineticBullet extends Projectile {
     public static final EntityType<EntityKineticBullet> TYPE = EntityType.Builder.<EntityKineticBullet>of(EntityKineticBullet::new, MobCategory.MISC).noSummon().noSave().fireImmune().sized(0.0625F, 0.0625F).clientTrackingRange(5).updateInterval(5).setShouldReceiveVelocityUpdates(false).build("bullet");
     public static final TagKey<EntityType<?>> USE_MAGIC_DAMAGE_ON = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse("tacz:use_magic_damage_on"));
     public static final TagKey<EntityType<?>> USE_VOID_DAMAGE_ON = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse("tacz:use_void_damage_on"));
@@ -110,6 +113,13 @@ public class EntityKineticBullet extends Projectile implements IEntityAdditional
     public static final String TRACER_SIZE_OVERRIDER_KEY = GunMod.MOD_ID + ":tracer_size";
 
     private static final ExplosionData DEFAULT_EXPLOSION_DATA = new ExplosionData(false, 0, 0, false, 30, false);
+
+    /**
+     * 1.21 移除了 IEntityAdditionalSpawnData，子弹的生成期数据改由同步实体数据承载。
+     * 用一个 CompoundTag 一次性带上全部 spawn 字段，避免为 18 个字段各建一个 accessor。
+     */
+    private static final EntityDataAccessor<CompoundTag> SPAWN_DATA =
+            SynchedEntityData.defineId(EntityKineticBullet.class, EntityDataSerializers.COMPOUND_TAG);
 
     private ResourceLocation ammoId = DefaultAssets.EMPTY_AMMO_ID;
     private int life = 200;
@@ -220,6 +230,8 @@ public class EntityKineticBullet extends Projectile implements IEntityAdditional
         this.startPos = this.position();
         this.isTracerAmmo = isTracerAmmo;
         this.gunDisplayId = gunDisplayId;
+        // 生成期数据写入同步数据，客户端收到后由 onSyncedDataUpdated 应用
+        this.entityData.set(SPAWN_DATA, this.buildSpawnTag());
     }
 
     @ApiStatus.Internal
@@ -236,7 +248,8 @@ public class EntityKineticBullet extends Projectile implements IEntityAdditional
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(SPAWN_DATA, new CompoundTag());
     }
 
     @Override
@@ -246,7 +259,9 @@ public class EntityKineticBullet extends Projectile implements IEntityAdditional
         this.onBulletTick();
         // 粒子效果
         if (this.level().isClientSide) {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> AmmoParticleSpawner.addParticle(this));
+            if (FMLEnvironment.dist.isClient()) {
+                AmmoParticleSpawner.addParticle(this);
+            }
         }
         // 子弹模型的旋转与抛物线
         Vec3 movement = this.getDeltaMovement();
@@ -409,8 +424,8 @@ public class EntityKineticBullet extends Projectile implements IEntityAdditional
         float headShotMultiplier = Math.max(this.headShot, 0);
         // 发布Pre事件
         var preEvent = new EntityHurtByGunEvent.Pre(this, entity, attacker, this.gunId, this.gunDisplayId, damage, sources, headshot, headShotMultiplier, LogicalSide.SERVER);
-        var cancelled = NeoForge.EVENT_BUS.post(preEvent);
-        if (cancelled) {
+        NeoForge.EVENT_BUS.post(preEvent);
+        if (preEvent.isCanceled()) {
             return;
         }
         // 刷新由Pre事件修改后的参数
@@ -428,7 +443,7 @@ public class EntityKineticBullet extends Projectile implements IEntityAdditional
         }
         // 点燃
         if (this.igniteEntity && AmmoConfig.IGNITE_ENTITY.get()) {
-            entity.setSecondsOnFire(this.igniteEntityTime);
+            entity.igniteForSeconds(this.igniteEntityTime);
             // 给予粒子效果
             if (this.level() instanceof ServerLevel serverLevel) {
                 serverLevel.sendParticles(ParticleTypes.LAVA, entity.getX(), entity.getY() + entity.getEyeHeight(), entity.getZ(), 1, 0, 0, 0, 0);
@@ -483,7 +498,9 @@ public class EntityKineticBullet extends Projectile implements IEntityAdditional
         Vec3 hitVec = result.getLocation();
         // 触发事件
         // 提前触发事件以让事件可以取消原版的命中行为（例如敲钟，打倒靶子等）
-        if (NeoForge.EVENT_BUS.post(new AmmoHitBlockEvent(this.level(), result, this.level().getBlockState(pos), this))) {
+        AmmoHitBlockEvent ammoHitBlockEvent = new AmmoHitBlockEvent(this.level(), result, this.level().getBlockState(pos), this);
+        NeoForge.EVENT_BUS.post(ammoHitBlockEvent);
+        if (ammoHitBlockEvent.isCanceled()) {
             return;
         }
         super.onHitBlock(result);
@@ -590,58 +607,78 @@ public class EntityKineticBullet extends Projectile implements IEntityAdditional
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity serverEntity) {
+        // 生成期数据已并入 SynchedEntityData（SPAWN_DATA），这里走父类默认实现即可
+        return super.getAddEntityPacket(serverEntity);
     }
 
-    @Override
-    public void writeSpawnData(FriendlyByteBuf buffer) {
-        buffer.writeFloat(getXRot());
-        buffer.writeFloat(getYRot());
-        buffer.writeDouble(getDeltaMovement().x);
-        buffer.writeDouble(getDeltaMovement().y);
-        buffer.writeDouble(getDeltaMovement().z);
-        Entity entity = getOwner();
-        buffer.writeInt(entity != null ? entity.getId() : 0);
-        buffer.writeResourceLocation(ammoId);
-        buffer.writeFloat(this.gravity);
-        buffer.writeBoolean(this.explosion);
-        buffer.writeBoolean(this.igniteEntity);
-        buffer.writeBoolean(this.igniteBlock);
-        buffer.writeFloat(this.explosionRadius);
-        buffer.writeFloat(this.explosionDamage);
-        buffer.writeInt(this.life);
-        buffer.writeFloat(this.speed);
-        buffer.writeFloat(this.friction);
-        buffer.writeInt(this.pierce);
-        buffer.writeBoolean(this.isTracerAmmo);
-        buffer.writeResourceLocation(this.gunId);
-        buffer.writeResourceLocation(this.gunDisplayId);
+    /**
+     * 把生成期字段打进一个 CompoundTag，由 {@link #SPAWN_DATA} 同步给客户端。
+     */
+    private CompoundTag buildSpawnTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.putFloat("XRot", getXRot());
+        tag.putFloat("YRot", getYRot());
+        Vec3 movement = getDeltaMovement();
+        tag.putDouble("DX", movement.x);
+        tag.putDouble("DY", movement.y);
+        tag.putDouble("DZ", movement.z);
+        Entity owner = getOwner();
+        tag.putInt("Owner", owner != null ? owner.getId() : 0);
+        tag.putString("AmmoId", this.ammoId.toString());
+        tag.putFloat("Gravity", this.gravity);
+        tag.putBoolean("Explosion", this.explosion);
+        tag.putBoolean("IgniteEntity", this.igniteEntity);
+        tag.putBoolean("IgniteBlock", this.igniteBlock);
+        tag.putFloat("ExplosionRadius", this.explosionRadius);
+        tag.putFloat("ExplosionDamage", this.explosionDamage);
+        tag.putInt("Life", this.life);
+        tag.putFloat("Speed", this.speed);
+        tag.putFloat("Friction", this.friction);
+        tag.putInt("Pierce", this.pierce);
+        tag.putBoolean("Tracer", this.isTracerAmmo);
+        tag.putString("GunId", this.gunId.toString());
+        tag.putString("GunDisplayId", this.gunDisplayId.toString());
+        return tag;
     }
 
-    @Override
-    public void readSpawnData(FriendlyByteBuf additionalData) {
-        setXRot(additionalData.readFloat());
-        setYRot(additionalData.readFloat());
-        setDeltaMovement(additionalData.readDouble(), additionalData.readDouble(), additionalData.readDouble());
-        Entity entity = this.level().getEntity(additionalData.readInt());
-        if (entity != null) {
-            this.setOwner(entity);
+    /**
+     * 客户端在收到 {@link #SPAWN_DATA} 更新时应用到本地字段。
+     */
+    private void applySpawnTag(CompoundTag tag) {
+        if (tag == null || tag.isEmpty()) {
+            return;
         }
-        this.ammoId = additionalData.readResourceLocation();
-        this.gravity = additionalData.readFloat();
-        this.explosion = additionalData.readBoolean();
-        this.igniteEntity = additionalData.readBoolean();
-        this.igniteBlock = additionalData.readBoolean();
-        this.explosionRadius = additionalData.readFloat();
-        this.explosionDamage = additionalData.readFloat();
-        this.life = additionalData.readInt();
-        this.speed = additionalData.readFloat();
-        this.friction = additionalData.readFloat();
-        this.pierce = additionalData.readInt();
-        this.isTracerAmmo = additionalData.readBoolean();
-        this.gunId = additionalData.readResourceLocation();
-        this.gunDisplayId = additionalData.readResourceLocation();
+        setXRot(tag.getFloat("XRot"));
+        setYRot(tag.getFloat("YRot"));
+        setDeltaMovement(tag.getDouble("DX"), tag.getDouble("DY"), tag.getDouble("DZ"));
+        int ownerId = tag.getInt("Owner");
+        Entity owner = ownerId != 0 ? this.level().getEntity(ownerId) : null;
+        if (owner != null) {
+            this.setOwner(owner);
+        }
+        this.ammoId = ResourceLocation.tryParse(tag.getString("AmmoId"));
+        this.gravity = tag.getFloat("Gravity");
+        this.explosion = tag.getBoolean("Explosion");
+        this.igniteEntity = tag.getBoolean("IgniteEntity");
+        this.igniteBlock = tag.getBoolean("IgniteBlock");
+        this.explosionRadius = tag.getFloat("ExplosionRadius");
+        this.explosionDamage = tag.getFloat("ExplosionDamage");
+        this.life = tag.getInt("Life");
+        this.speed = tag.getFloat("Speed");
+        this.friction = tag.getFloat("Friction");
+        this.pierce = tag.getInt("Pierce");
+        this.isTracerAmmo = tag.getBoolean("Tracer");
+        this.gunId = ResourceLocation.tryParse(tag.getString("GunId"));
+        this.gunDisplayId = ResourceLocation.tryParse(tag.getString("GunDisplayId"));
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (SPAWN_DATA.equals(key)) {
+            this.applySpawnTag(this.entityData.get(SPAWN_DATA));
+        }
     }
 
     public ResourceLocation getAmmoId() {
