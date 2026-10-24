@@ -18,17 +18,18 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class GunSmithTableMenu extends AbstractContainerMenu {
-    public static final MenuType<GunSmithTableMenu> TYPE = IForgeMenuType.create((windowId, inv, data) -> {
+    public static final MenuType<GunSmithTableMenu> TYPE = IMenuTypeExtension.create((windowId, inv, data) -> {
         ResourceLocation blockId = data.readResourceLocation();
         return new GunSmithTableMenu(windowId, inv, blockId);
     });
@@ -65,8 +66,9 @@ public class GunSmithTableMenu extends AbstractContainerMenu {
             }
         }
 
-        Recipe<?> recipe = recipeManager.byKey(recipeId).orElse(null);
-        if (recipe instanceof GunSmithTableRecipe gunSmithTableRecipe) {
+        var holder = recipeManager.byKey(recipeId).orElse(null);
+        if (holder != null && holder.value() instanceof GunSmithTableRecipe gunSmithTableRecipe) {
+            gunSmithTableRecipe.setId(holder.id());
             boolean flag = TimelessAPI.getCommonBlockIndex(getBlockId()).map(blockIndex -> {
                 return blockIndex.getData().getTabs().stream().noneMatch(tab -> tab.id().equals(gunSmithTableRecipe.getTab()));
             }).orElse(true);

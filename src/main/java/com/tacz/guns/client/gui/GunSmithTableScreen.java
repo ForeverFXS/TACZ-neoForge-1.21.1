@@ -126,7 +126,12 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
         if (Minecraft.getInstance().level != null) {
             RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
             List<GunSmithTableRecipe> recipeList = recipeManager.getAllRecipesFor(ModRecipe.GUN_SMITH_TABLE_CRAFTING.get())
-                    .stream().map(RecipeHolder::value).toList();
+                    .stream().map(holder -> {
+                        GunSmithTableRecipe recipe = holder.value();
+                        // 1.21 的 id 由 RecipeHolder 携带，这里回写给配方对象
+                        recipe.setId(holder.id());
+                        return recipe;
+                    }).toList();
             Set<String> namespaces = filterList != null ? filterList.namespaceList() : null;
             for (GunSmithTableRecipe recipe : recipeList) {
                 ResourceLocation id = recipe.getId();
@@ -255,9 +260,10 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     private GunSmithTableRecipe getSelectedRecipe(ResourceLocation recipeId) {
         if (Minecraft.getInstance().level != null) {
             RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-            Recipe<?> recipe = recipeManager.byKey(recipeId).orElse(null);
-            if (recipe instanceof GunSmithTableRecipe) {
-                return (GunSmithTableRecipe) recipe;
+            var holder = recipeManager.byKey(recipeId).orElse(null);
+            if (holder != null && holder.value() instanceof GunSmithTableRecipe gunRecipe) {
+                gunRecipe.setId(holder.id());
+                return gunRecipe;
             }
         }
         return null;
