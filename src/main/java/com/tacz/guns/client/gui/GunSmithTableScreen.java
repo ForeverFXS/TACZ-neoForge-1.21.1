@@ -38,7 +38,9 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -123,7 +125,8 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
 
         if (Minecraft.getInstance().level != null) {
             RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-            List<GunSmithTableRecipe> recipeList = recipeManager.getAllRecipesFor(ModRecipe.GUN_SMITH_TABLE_CRAFTING.get());
+            List<GunSmithTableRecipe> recipeList = recipeManager.getAllRecipesFor(ModRecipe.GUN_SMITH_TABLE_CRAFTING.get())
+                    .stream().map(RecipeHolder::value).toList();
             Set<String> namespaces = filterList != null ? filterList.namespaceList() : null;
             for (GunSmithTableRecipe recipe : recipeList) {
                 ResourceLocation id = recipe.getId();
@@ -298,8 +301,8 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
             this.filterList.setByHandSelected(this.shouldFilterByMainHand());
             this.autoByHandFilterApplied = true;
         }
-        this.filterList.updateSize(134, this.imageHeight, topPos, topPos+imageHeight+1);
-        this.filterList.setLeftPos(leftPos);
+        this.filterList.updateSizeAndPosition(134, this.imageHeight, topPos);
+        this.filterList.setX(leftPos);
 
         this.classifyRecipes();
         this.updateSelectedRecipeAfterFiltering();
@@ -323,7 +326,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     }
 
     private void addCraftButton() {
-        this.addRenderableWidget(new ImageButton(leftPos + 289, topPos + 162, 48, 18, 138, 164, 18, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 289, topPos + 162, 48, 18, 138, 164, 18, TEXTURE, () -> {
             if (this.selectedRecipe != null && playerIngredientCount != null) {
                 // 检查是否能合成，不能就不发包
                 List<GunSmithTableIngredient> inputs = selectedRecipe.getInputs();
@@ -346,7 +349,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     }
 
     private void addUrlButton() {
-        this.addRenderableWidget(new ImageButton(leftPos + 112, topPos + 164, 18, 18, 149, 211, 18, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 112, topPos + 164, 18, 18, 149, 211, 18, TEXTURE, () -> {
             if (this.selectedRecipe != null) {
                 ItemStack output = selectedRecipe.getOutput();
                 Item item = output.getItem();
@@ -434,13 +437,13 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     }
 
     private void addIndexPageButtons() {
-        this.addRenderableWidget(new ImageButton(leftPos + 143, topPos + 56, 96, 6, 40, 166, 6, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 143, topPos + 56, 96, 6, 40, 166, 6, TEXTURE, () -> {
             if (this.indexPage > 0) {
                 this.indexPage--;
                 this.init();
             }
         }));
-        this.addRenderableWidget(new ImageButton(leftPos + 143, topPos + 171, 96, 6, 40, 186, 6, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 143, topPos + 171, 96, 6, 40, 186, 6, TEXTURE, () -> {
             if (selectedRecipeList != null && !selectedRecipeList.isEmpty()) {
                 int maxIndexPage = (selectedRecipeList.size() - 1) / 6;
                 if (this.indexPage < maxIndexPage) {
@@ -452,13 +455,13 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     }
 
     private void addTypePageButtons() {
-        this.addRenderableWidget(new ImageButton(leftPos + 136, topPos + 4, 18, 20, 0, 162, 20, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 136, topPos + 4, 18, 20, 0, 162, 20, TEXTURE, () -> {
             if (this.typePage > 0) {
                 this.typePage--;
                 this.init();
             }
         }));
-        this.addRenderableWidget(new ImageButton(leftPos + 327, topPos + 4, 18, 20, 20, 162, 20, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 327, topPos + 4, 18, 20, 20, 162, 20, TEXTURE, () -> {
             int maxIndexPage = (recipes.size() - 1) / 7;
             if (this.typePage < maxIndexPage) {
                 this.typePage++;
@@ -468,21 +471,21 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     }
 
     private void addScaleButtons() {
-        this.addRenderableWidget(new ImageButton(leftPos + 5, topPos + 5, 10, 10, 188, 173, 10, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 5, topPos + 5, 10, 10, 188, 173, 10, TEXTURE, () -> {
             this.scale = Math.min(this.scale + 20, 200);
         }));
-        this.addRenderableWidget(new ImageButton(leftPos + 17, topPos + 5, 10, 10, 200, 173, 10, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 17, topPos + 5, 10, 10, 200, 173, 10, TEXTURE, () -> {
             this.scale = Math.max(this.scale - 20, 10);
         }));
-        this.addRenderableWidget(new ImageButton(leftPos + 29, topPos + 5, 10, 10, 212, 173, 10, TEXTURE, b -> {
+        this.addRenderableWidget(new TaczImageButton(leftPos + 29, topPos + 5, 10, 10, 212, 173, 10, TEXTURE, () -> {
             this.scale = 70;
         }));
     }
 
     @Override
-    public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
         if (pMouseX > leftPos + 143 && pMouseX < leftPos + 143 + 94 && pMouseY > topPos + 66 && pMouseY < topPos + 66 + 85) {
-            if (pDelta > 0) {
+            if (pScrollY > 0) {
                 this.indexPage = Math.max(0, this.indexPage - 1);
             } else {
                 int maxIndexPage = (selectedRecipeList.size() - 1) / 6;
@@ -491,7 +494,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
             this.init();
             return true;
         }
-        return super.mouseScrolled(pMouseX, pMouseY, pDelta);
+        return super.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY);
     }
 
     @Override
@@ -660,12 +663,13 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
         int scissorH = (int) (height * windowGuiScale);
         RenderSystem.enableScissor(scissorX, scissorY, scissorW, scissorH);
 
-        Minecraft.getInstance().textureManager.getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
+        Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        PoseStack posestack = RenderSystem.getModelViewStack();
+        // 1.21 的 getModelViewStack() 返回 Matrix4fStack，这里改用局部 PoseStack
+        PoseStack posestack = new PoseStack();
         posestack.pushPose();
         posestack.translate(xPos, yPos, 200);
         posestack.translate(8.0D, 8.0D, 0.0D);
@@ -674,8 +678,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
         float rot = (System.currentTimeMillis() % (int) (rotationPeriod * 1000)) * (360f / (rotationPeriod * 1000));
         posestack.mulPose(Axis.XP.rotationDegrees(rotPitch));
         posestack.mulPose(Axis.YP.rotationDegrees(rot));
-        RenderSystem.applyModelViewMatrix();
-        PoseStack tmpPose = new PoseStack();
+        PoseStack tmpPose = posestack;
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
         Lighting.setupForFlatItems();
 
@@ -685,7 +688,6 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
         RenderSystem.enableDepthTest();
         Lighting.setupFor3DItems();
         posestack.popPose();
-        RenderSystem.applyModelViewMatrix();
 
         RenderSystem.disableScissor();
     }
@@ -696,7 +698,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
 
     @Override
     protected void renderBg(@NotNull GuiGraphics gui, float partialTick, int mouseX, int mouseY) {
-        this.renderBackground(gui);
+        this.renderBackground(gui, mouseX, mouseY, partialTick);
         gui.blit(SIDE, leftPos, topPos, 0, 0, 134, 187);
         gui.blit(TEXTURE, leftPos + 136, topPos + 27, 0, 0, 208, 160);
     }
@@ -704,5 +706,47 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    /**
+     * 1.21 的 ImageButton 改用 WidgetSprites（独立 sprite 纹理），
+     * 而本屏幕的按钮都从同一张 TEXTURE 按 uv 切块，故保留原绘制方式自定义实现。
+     */
+    private static class TaczImageButton extends AbstractButton {
+        private final int texU;
+        private final int texV;
+        private final int texH;
+        private final ResourceLocation texture;
+        private final Runnable action;
+
+        TaczImageButton(int x, int y, int width, int height, int texU, int texV, int texH,
+                        ResourceLocation texture, Runnable action) {
+            super(x, y, width, height, Component.empty());
+            this.texU = texU;
+            this.texV = texV;
+            this.texH = texH;
+            this.texture = texture;
+            this.action = action;
+        }
+
+        @Override
+        public void onPress() {
+            this.action.run();
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            RenderSystem.enableDepthTest();
+            graphics.blit(this.texture, this.getX(), this.getY(), this.texU, this.texV,
+                    this.width, this.height, 256, this.texH);
+            if (this.isHovered()) {
+                graphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x30FFFFFF);
+            }
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput output) {
+            this.defaultButtonNarrationText(output);
+        }
     }
 }

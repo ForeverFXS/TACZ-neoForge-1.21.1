@@ -31,8 +31,8 @@ public class GunPackList extends ContainerObjectSelectionList<GunPackList.Entry>
 
     public GunPackList(Minecraft pMinecraft, int pWidth, int pHeight, int pY0, int pY1, int pItemHeight,
                        Map<ResourceLocation, List<ResourceLocation>> recipes, GunSmithTableScreen parent) {
-        // 1.21 的 ContainerObjectSelectionList 不再接收 itemHeight，行高改由 Entry 自身决定
-        super(pMinecraft, pWidth, pHeight, pY0, pY1);
+        // 1.21 构造器为 (Minecraft, width, height, y, itemHeight)，不再接收 y1
+        super(pMinecraft, pWidth, pHeight, pY0, pItemHeight);
         this.parent = parent;
         Set<String> namespaces = new HashSet<>();
         for (List<ResourceLocation> entry : recipes.values()) {
