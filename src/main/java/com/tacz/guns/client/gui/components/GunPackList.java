@@ -31,9 +31,8 @@ public class GunPackList extends ContainerObjectSelectionList<GunPackList.Entry>
 
     public GunPackList(Minecraft pMinecraft, int pWidth, int pHeight, int pY0, int pY1, int pItemHeight,
                        Map<ResourceLocation, List<ResourceLocation>> recipes, GunSmithTableScreen parent) {
-        super(pMinecraft, pWidth, pHeight, pY0, pY1, pItemHeight);
-        this.setRenderBackground(false);
-        this.setRenderTopAndBottom(false);
+        // 1.21 的 ContainerObjectSelectionList 不再接收 itemHeight，行高改由 Entry 自身决定
+        super(pMinecraft, pWidth, pHeight, pY0, pY1);
         this.parent = parent;
         Set<String> namespaces = new HashSet<>();
         for (List<ResourceLocation> entry : recipes.values()) {
@@ -114,27 +113,32 @@ public class GunPackList extends ContainerObjectSelectionList<GunPackList.Entry>
     }
 
     protected int getScrollbarPosition() {
-        return this.x1 - 2;
+        return this.getX() + this.getWidth() - 2;
     }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(pGuiGraphics);
-        pGuiGraphics.fill(this.x0, this.y0, this.x1, this.y1, 0x80000000);
+    public void renderWidget(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        // 1.21 移除了 x0/y0/x1/y1 字段与 renderBackground/renderList，
+        // 坐标改由 getX()/getY()/getWidth()/getHeight() 提供，列表渲染改用 renderListItems
+        int x0 = this.getX();
+        int y0 = this.getY();
+        int x1 = x0 + this.getWidth();
+        int y1 = y0 + this.getHeight();
+        pGuiGraphics.fill(x0, y0, x1, y1, 0x80000000);
         int i = this.getScrollbarPosition();
         int j = i + 6;
 
         this.enableScissor(pGuiGraphics);
-        this.renderList(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        this.renderListItems(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         pGuiGraphics.disableScissor();
 
         int i2 = this.getMaxScroll();
         if (i2 > 0) {
-            int j2 = (int)((float)((this.y1 - this.y0) * (this.y1 - this.y0)) / (float)this.getMaxPosition());
-            j2 = Mth.clamp(j2, 32, this.y1 - this.y0 - 8);
-            int k1 = (int)this.getScrollAmount() * (this.y1 - this.y0 - j2) / i2 + this.y0;
-            if (k1 < this.y0) {
-                k1 = this.y0;
+            int j2 = (int)((float)((y1 - y0) * (y1 - y0)) / (float)this.getMaxPosition());
+            j2 = Mth.clamp(j2, 32, y1 - y0 - 8);
+            int k1 = (int)this.getScrollAmount() * (y1 - y0 - j2) / i2 + y0;
+            if (k1 < y0) {
+                k1 = y0;
             }
             pGuiGraphics.fill(i, k1, j, k1 + j2, -8355712);
             pGuiGraphics.fill(i, k1, j - 1, k1 + j2 - 1, -4144960);
@@ -145,7 +149,7 @@ public class GunPackList extends ContainerObjectSelectionList<GunPackList.Entry>
     }
 
     public int getRowLeft() {
-        return this.x0 + 4;
+        return this.getX() + 4;
     }
 
     public int getRowWidth() {
